@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using CustomLanguage.Shared;
 using HarmonyLib;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -38,7 +39,7 @@ namespace CustomLanguageFixes
             LangMenuPatch.Apply(harmony); // мод-мови у вбудованому меню вибору мов
             FontPatch.Apply(harmony);     // зум шрифта пака не затирається shrinkFont'ом
             JustifyPatch.Apply(harmony);  // рівний правий край тексту діалогів (justify)
-            BundlePatch.Apply(helper);    // локалізовані назви клунків одразу, без перезаходу
+            BundlePatch.Apply(helper, this.Monitor, () => true); // локалізовані назви клунків одразу
 
             helper.Events.Content.AssetReady += OnAssetReady;          // застосувати мову при старті
             LocalizedContentManager.OnLanguageChange += OnLanguageChanged; // запам'ятати вибір з вбудованого меню
@@ -182,91 +183,6 @@ namespace CustomLanguageFixes
             if (__state)
                 LangField.SetValue(null, LocalizedContentManager.LanguageCode.mod);
             return __exception;
-        }
-    }
-
-    // --- Клунки: назви бандлів застигають англійськими, бо Data\Bundles кешується
-    // до застосування мод-мови, а кеш _bundleData перебудовується лише раз за сесію ---
-    internal static class BundlePatch
-    {
-        private static bool _rebuilding;
-
-        public static void Apply(IModHelper helper)
-        {
-            helper.Events.GameLoop.SaveLoaded += (_, _) => RefreshBundleNames();
-            // пак вмикає переклад клунків за умовою стану сейва (зустрів клунки чи ні),
-            // тому CP може підмінити Data/Bundles посеред сесії — ловимо і перебудовуємо
-            helper.Events.Content.AssetsInvalidated += (_, e) =>
-            {
-                if (!Context.IsWorldReady || _rebuilding)
-                    return;
-                foreach (var n in e.Names)
-                {
-                    string name = n.Name.Replace('\\', '/');
-                    if (name.StartsWith("Data/Bundles", StringComparison.OrdinalIgnoreCase))
-                    {
-                        RebuildNames();
-                        break;
-                    }
-                }
-            };
-        }
-
-        // перебудувати кеш назв зі свіжого асета (без інвалідацій — щоб не зациклитись)
-        private static void RebuildNames()
-        {
-            try
-            {
-                if (LocalizedContentManager.CurrentLanguageCode != LocalizedContentManager.LanguageCode.mod)
-                    return;
-                var ws = Game1.netWorldState?.Value;
-                if (ws == null)
-                    return;
-                AccessTools.Field(ws.GetType(), "_bundleDataDirty")?.SetValue(ws, true);
-                _ = ws.BundleData;
-                ModEntry.Log.Log("Назви клунків перебудовано після оновлення асета.", LogLevel.Trace);
-            }
-            catch (Exception ex)
-            {
-                ModEntry.Log.Log("Не вдалося перебудувати назви клунків: " + ex.Message, LogLevel.Warn);
-            }
-        }
-
-        internal static void RefreshBundleNames()
-        {
-            _rebuilding = true;
-            try
-            {
-                if (LocalizedContentManager.CurrentLanguageCode != LocalizedContentManager.LanguageCode.mod)
-                    return;
-                var ws = Game1.netWorldState?.Value;
-                if (ws == null)
-                    return;
-
-                // резолвер локалізованих асетів — статичний і чиститься лише при зміні
-                // КОДУ мови чи виході в меню; застиглий маршрут «Data\Bundles → база (en)»
-                // переживає і перемикання mod→mod, і InvalidateCache — чистимо самі
-                LocalizedContentManager.localizedAssetNames.Clear();
-
-                // скинути закешований (ще англійський) асет — і сам словник, і фолбек назв
-                ModEntry.H.GameContent.InvalidateCache("Data/Bundles");
-                ModEntry.H.GameContent.InvalidateCache("Strings/BundleNames");
-
-                // кеш назв уже позначений «чистим» — брудним його, і геттер сам
-                // перебудує назви через UpdateBundleDisplayNames() зі свіжого асета.
-                // Прогрес/вимоги/remixed не зачіпаються: SetBundleData не викликається.
-                AccessTools.Field(ws.GetType(), "_bundleDataDirty")?.SetValue(ws, true);
-                _ = ws.BundleData;
-                ModEntry.Log.Log("Назви клунків перелокалізовано.", LogLevel.Trace);
-            }
-            catch (Exception ex)
-            {
-                ModEntry.Log.Log("Не вдалося оновити назви клунків: " + ex.Message, LogLevel.Warn);
-            }
-            finally
-            {
-                _rebuilding = false;
-            }
         }
     }
 

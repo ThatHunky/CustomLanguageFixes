@@ -12,5 +12,6 @@
     <Reference Include="StardewValley"><HintPath>libs/StardewValley.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="StardewValley.GameData"><HintPath>libs/StardewValley.GameData.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="StardewModdingAPI"><HintPath>libs/StardewModdingAPI.dll</HintPath><Private>false</Private></Reference>
+    <Compile Include="..\Shared\**\*.cs" LinkBase="Shared" />
   </ItemGroup>
 </Project>
