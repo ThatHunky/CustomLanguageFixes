@@ -47,6 +47,7 @@ namespace CustomLanguageFixes
             JustifyPatch.Apply(harmony);  // рівний правий край тексту діалогів (justify)
             BundlePatch.Apply(helper, this.Monitor, () => Config.BundleNamesFix); // локалізовані назви клунків одразу
 
+            helper.Events.GameLoop.GameLaunched += OnGameLaunched;     // меню налаштувань (GMCM), якщо є
             helper.Events.Content.AssetReady += OnAssetReady;          // застосувати мову при старті
             LocalizedContentManager.OnLanguageChange += OnLanguageChanged; // запам'ятати вибір з вбудованого меню
         }
@@ -64,6 +65,31 @@ namespace CustomLanguageFixes
             }
             if (Context.IsWorldReady)
                 BundlePatch.RefreshBundleNames(); // мову змінили посеред сесії — перелокалізувати клунки
+        }
+
+        // ---------- меню налаштувань ----------
+
+        private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
+        {
+            var gmcm = H.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
+            if (gmcm == null)
+                return; // GMCM не встановлено — лишається config.json
+
+            gmcm.Register(this.ModManifest, () => Config = new ModConfig(), () => H.WriteConfig(Config));
+            gmcm.AddTextOption(this.ModManifest, () => Config.Clock, v => Config.Clock = v,
+                () => H.Translation.Get("config.clock.name"), () => H.Translation.Get("config.clock.desc"),
+                new[] { "24h", "12h" });
+            gmcm.AddBoolOption(this.ModManifest, () => Config.LanguageMenu, v => Config.LanguageMenu = v,
+                () => H.Translation.Get("config.language-menu.name"), () => H.Translation.Get("config.language-menu.desc"));
+            gmcm.AddBoolOption(this.ModManifest, () => Config.RecipeSuffix, v => Config.RecipeSuffix = v,
+                () => H.Translation.Get("config.recipe-suffix.name"), () => H.Translation.Get("config.recipe-suffix.desc"));
+            gmcm.AddBoolOption(this.ModManifest, () => Config.FontZoomFix, v => Config.FontZoomFix = v,
+                () => H.Translation.Get("config.font-zoom.name"), () => H.Translation.Get("config.font-zoom.desc"));
+            gmcm.AddBoolOption(this.ModManifest, () => Config.JustifyDialogue, v => Config.JustifyDialogue = v,
+                () => H.Translation.Get("config.justify.name"), () => H.Translation.Get("config.justify.desc"));
+            gmcm.AddBoolOption(this.ModManifest, () => Config.BundleNamesFix,
+                v => { Config.BundleNamesFix = v; if (v && Context.IsWorldReady) BundlePatch.RefreshBundleNames(); },
+                () => H.Translation.Get("config.bundles.name"), () => H.Translation.Get("config.bundles.desc"));
         }
 
         // ---------- мовна логіка ----------
