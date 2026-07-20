@@ -7,10 +7,10 @@
   "log.bundles-failed": "Не вдалося оновити назви клунків: {{error}}",
 
   "config.clock.name": "Формат часу",
-  "config.clock.desc": "24h — 24-годинний час для кастомних мов; 12h — як у ванілі.",
-  "config.recipe-suffix.name": "Локалізований суфікс (Рецепт)",
-  "config.recipe-suffix.desc": "Перекладає суфікс (Recipe) у назвах предметів. Діє лише для українських паків.",
-  "config.font-zoom.name": "Фікс зуму шрифта",
+  "config.clock.desc": "24 години — час на годиннику як 21:00. 12 годин — як 9:00 з позначкою дп/пп.",
+  "config.clock.value-24h": "24 години",
+  "config.clock.value-12h": "12 годин",
+  "config.font-zoom.name": "Виправлення зуму шрифта",
   "config.font-zoom.desc": "Зберігає зум шрифта мовного пака, не даючи грі його скинути.",
   "config.justify.name": "Рівний край тексту діалогів",
   "config.justify.desc": "Розтягує пробіли, щоб правий край тексту діалогів був рівним."

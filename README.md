@@ -15,7 +15,7 @@ Tested on Stardew Valley **1.6.15.3** (Android build 245, SMAPI 4.3.2) and **1.6
 
 | Feature | Problem | Fix |
 |---|---|---|
-| **24h HUD clock** | The mobile `DayTimeMoneyBox.draw()` is forked code with no `mod` branch in its language switch, so custom languages fall through to the 12h default | Harmony prefix swaps `_currentLangCode` from `mod` to `de` (whose branch is already 24h) for the duration of the draw call; a finalizer restores it |
+| **HUD clock** | The mobile `DayTimeMoneyBox.draw()` is forked code with no `mod` branch in its language switch. Custom languages fall through to a 12-hour clock **with no am/pm suffix** — 9:00 and 21:00 look identical | Harmony prefix swaps `_currentLangCode` for the duration of the draw call, and a finalizer restores it: to `de` for a 24-hour clock (default), or to `en` for a real 12-hour clock. In 12-hour mode the am/pm strings would then resolve to English, so the pack's own translations are substituted for those two keys while the swap is active |
 | **Custom languages in the language menu** | The built-in mobile `LanguageSelectionMenu` only lists 12 hardcoded languages | Postfixes on `SetupButtons`/`draw`/`releaseLeftClick` append a row per installed pack (using each pack's own `ButtonTexture`), extend the scroll area, and handle taps. Multiple packs each get their own row |
 | **Language memory** | Auto-switching forced the pack language back even when the player deliberately picked another one | The choice (including vanilla languages) is written to `config.json` and to the game's preferences, and respected on startup |
 | **Localized «(Recipe)» suffix** | The `(Recipe)` suffix on item names was left untranslated | Postfix on `Object.DisplayName`: food (category −7) gets «(Рецепт)», everything else «(Креслення)». Only runs for packs with language code `uk` — other languages are unaffected. Ported from DID's desktop mod RecipeUkrainizacija |
@@ -45,15 +45,15 @@ Every feature can be switched off. Edit `config.json` in the mod folder, or use 
 
 | Setting | Default | In GMCM | Meaning |
 |---|---|---|---|
-| `Clock` | `"24h"` | yes | `"24h"` = 24-hour clock for custom languages; `"12h"` = vanilla behavior |
-| `RecipeSuffix` | `true` | yes | Localized `(Recipe)` suffix (only active for `uk` packs) |
+| `Clock` | `"24h"` | yes | `"24h"` = 21:00; `"12h"` = 9:00 with a localized am/pm suffix |
 | `FontZoomFix` | `true` | yes | Keep the pack's font zoom |
 | `JustifyDialogue` | `true` | yes | Justified dialogue text |
 | `PreferredLanguage` | `""` | no | `""` = auto (first installed pack), `"en"` = English, or a pack ID such as `"Pereclaw.ukrainizacija"`. Set by picking a language in the game's language menu |
+| `RecipeSuffix` | `true` | no | Localized `(Recipe)` suffix (only active for `uk` packs) |
 | `LanguageMenu` | `true` | no | Show custom languages in the built-in language menu |
 | `BundleNamesFix` | `true` | no | Junimo bundle name fix |
 
-The last three are config-only escape hatches for troubleshooting a mod conflict — there's no reason to turn them off in normal play, and flipping them mid-session doesn't fully take effect (the language menu re-reads its setting the next time it opens, and already-localized bundle names only revert after a save reload).
+The last four are config-only escape hatches for troubleshooting a mod conflict — there's no reason to turn them off in normal play. Two of them wouldn't fully take effect mid-session anyway: the language menu re-reads its setting the next time it opens, and already-localized bundle names only revert after a save reload.
 
 **Custom Language Bundle Fix (PC):** a single `BundleNamesFix` setting in `config.json`, `true` by default. No in-game menu — there is nothing worth switching off.
 
@@ -104,6 +104,7 @@ tools/stardew-font-editor.html  — in-browser editor for the game's .fnt fonts;
 
 ## Version history
 
+- **2.1.0** — the 12-hour clock option now actually works: custom languages used to get 12-hour numbers with no am/pm at all, so the mod now swaps to the English branch and substitutes the pack's own am/pm strings. GMCM menu down to three settings with localized dropdown values; «(Recipe)» suffix is config-only now, since it's part of the translation rather than a preference. Mod renamed from «Custom Language Fixes (Android)» to «Custom Language Fixes»
 - **2.0.1** — GMCM menu trimmed to the four settings worth changing (`Clock` renamed to «Time format»); the language-menu and bundle-fix switches stay in `config.json` only. PC mod (1.0.1) drops its GMCM menu entirely
 - **2.0.0** — universal release: renamed from Солов'їна Долина, English-first with i18n (`default.json` + `uk.json`), per-feature config switches, in-game GMCM menu, and a separate PC mod sharing the bundle fix
 - **1.5.2** — bundles round 3: packs may gate their bundle translation on save state, so `AssetsInvalidated` is now handled and names rebuilt mid-session

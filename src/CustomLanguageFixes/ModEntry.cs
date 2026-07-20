@@ -19,12 +19,12 @@ namespace CustomLanguageFixes
     {
         // "" = авто (перша мод-мова), "en" = англійська, або Id мод-мови (напр. "Pereclaw.ukrainizacija")
         public string PreferredLanguage { get; set; } = "";
-        public string Clock { get; set; } = "24h";      // "24h" | "12h" (12h = ваніль)
-        public bool RecipeSuffix { get; set; } = true;   // (Рецепт)/(Креслення), діє лише для uk
+        public string Clock { get; set; } = "24h";      // "24h" | "12h" (обидва з дп/пп для мод-мов)
         public bool FontZoomFix { get; set; } = true;
         public bool JustifyDialogue { get; set; } = true;
 
         // Не виводяться в GMCM — лише аварійні вимикачі в config.json.
+        public bool RecipeSuffix { get; set; } = true;   // (Рецепт)/(Креслення), діє лише для uk
         // Зміна на льоту не дає повного ефекту: меню мов перечитує це при наступному
         // відкритті, а вже локалізовані назви клунків повернуться англійськими
         // тільки після перезавантаження сейва.
@@ -86,16 +86,16 @@ namespace CustomLanguageFixes
                 () => H.WriteConfig(Config));
             gmcm.AddTextOption(this.ModManifest, () => Config.Clock, v => Config.Clock = v,
                 () => H.Translation.Get("config.clock.name"), () => H.Translation.Get("config.clock.desc"),
-                new[] { "24h", "12h" });
-            gmcm.AddBoolOption(this.ModManifest, () => Config.RecipeSuffix, v => Config.RecipeSuffix = v,
-                () => H.Translation.Get("config.recipe-suffix.name"), () => H.Translation.Get("config.recipe-suffix.desc"));
+                new[] { "24h", "12h" },
+                v => H.Translation.Get("config.clock.value-" + v)); // у списку показуємо мовою гри
             gmcm.AddBoolOption(this.ModManifest, () => Config.FontZoomFix, v => Config.FontZoomFix = v,
                 () => H.Translation.Get("config.font-zoom.name"), () => H.Translation.Get("config.font-zoom.desc"));
             gmcm.AddBoolOption(this.ModManifest, () => Config.JustifyDialogue, v => Config.JustifyDialogue = v,
                 () => H.Translation.Get("config.justify.name"), () => H.Translation.Get("config.justify.desc"));
-            // LanguageMenu і BundleNamesFix у меню не виводимо: вимикати їх нема сенсу, а зміна
-            // на льоту все одно не дає очікуваного ефекту (див. коментарі в ModConfig).
-            // Обидві лишаються в config.json як аварійний вимикач при конфлікті з іншим модом.
+            // LanguageMenu, BundleNamesFix і RecipeSuffix у меню не виводимо: перші дві вимикати
+            // нема сенсу (і зміна на льоту не дає повного ефекту — див. коментарі в ModConfig),
+            // а суфікс «(Рецепт)» — частина українського перекладу, він має просто працювати.
+            // Усі три лишаються в config.json як аварійний вимикач при конфлікті з іншим модом.
         }
 
         // ---------- мовна логіка ----------
@@ -164,11 +164,23 @@ namespace CustomLanguageFixes
 
     }
 
-    // --- Годинник: на час draw() підміняємо mod -> de, гра сама малює 24h ---
+    // --- Годинник ---
+    // Мобільний DayTimeMoneyBox.draw() — форкнутий код, у чиєму switch по мовах нема гілки mod.
+    // Через це кастомна мова малює 12-годинний час БЕЗ дп/пп: суфікс дописується лише для
+    // en/it/ja/zh, тож «9:00» неможливо відрізнити від «21:00».
+    // 24h: підміняємо mod -> de (німецька гілка вже 24-годинна, суфікс не потрібен).
+    // 12h: підміняємо mod -> en (англійська гілка дописує суфікс), але тоді й LoadString
+    //      резолвив би АНГЛІЙСЬКИЙ асет — тому на час малювання підставляємо дп/пп мовного пака.
     internal static class ClockPatch
     {
         private static readonly FieldInfo LangField = AccessTools.Field(
             typeof(LocalizedContentManager), "_currentLangCode");
+
+        private const string AmKey = "DayTimeMoneyBox.cs.10370";
+        private const string PmKey = "DayTimeMoneyBox.cs.10371";
+
+        private static bool _substituteAmPm;   // активне лише всередині нашого draw
+        private static string _am, _pm, _cachedFor;
 
         public static void Apply(Harmony harmony)
         {
@@ -178,26 +190,72 @@ namespace CustomLanguageFixes
                 prefix: new HarmonyMethod(typeof(ClockPatch), nameof(DrawPrefix)),
                 finalizer: new HarmonyMethod(typeof(ClockPatch), nameof(DrawFinalizer))
             );
+            harmony.Patch(
+                original: AccessTools.Method(typeof(LocalizedContentManager), nameof(LocalizedContentManager.LoadString),
+                    new[] { typeof(string) }),
+                prefix: new HarmonyMethod(typeof(ClockPatch), nameof(LoadStringPrefix))
+            );
         }
 
         private static void DrawPrefix(ref bool __state)
         {
             __state = false;
-            if (!string.Equals(ModEntry.Config.Clock, "24h", StringComparison.OrdinalIgnoreCase))
-                return;
             var current = (LocalizedContentManager.LanguageCode)LangField.GetValue(null);
-            if (current == LocalizedContentManager.LanguageCode.mod)
+            if (current != LocalizedContentManager.LanguageCode.mod)
+                return;
+
+            if (string.Equals(ModEntry.Config.Clock, "12h", StringComparison.OrdinalIgnoreCase))
+            {
+                CacheAmPm(); // поки мова ще mod — інакше дістанемо англійські рядки
+                _substituteAmPm = true;
+                LangField.SetValue(null, LocalizedContentManager.LanguageCode.en);
+            }
+            else
             {
                 LangField.SetValue(null, LocalizedContentManager.LanguageCode.de);
-                __state = true;
             }
+            __state = true;
         }
 
         private static Exception DrawFinalizer(bool __state, Exception __exception)
         {
             if (__state)
+            {
                 LangField.SetValue(null, LocalizedContentManager.LanguageCode.mod);
+                _substituteAmPm = false;
+            }
             return __exception;
+        }
+
+        private static void CacheAmPm()
+        {
+            string id = LocalizedContentManager.CurrentModLanguage?.Id ?? "";
+            if (_cachedFor == id)
+                return;
+            try
+            {
+                _am = Game1.content.LoadString("Strings\\StringsFromCSFiles:" + AmKey);
+                _pm = Game1.content.LoadString("Strings\\StringsFromCSFiles:" + PmKey);
+                _cachedFor = id;
+            }
+            catch { _am = _pm = null; }
+        }
+
+        private static bool LoadStringPrefix(string path, ref string __result)
+        {
+            if (!_substituteAmPm || path == null)
+                return true;
+            if (path.EndsWith(AmKey, StringComparison.Ordinal) && _am != null)
+            {
+                __result = _am;
+                return false;
+            }
+            if (path.EndsWith(PmKey, StringComparison.Ordinal) && _pm != null)
+            {
+                __result = _pm;
+                return false;
+            }
+            return true;
         }
     }
 

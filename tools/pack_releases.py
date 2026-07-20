@@ -23,7 +23,7 @@ def pack(zip_name: str, folder: str, entries: list[tuple[str, str]]) -> None:
             print("   ", n)
 
 
-pack("CustomLanguageFixes-2.0.1.zip", "CustomLanguageFixes", [
+pack("CustomLanguageFixes-2.1.0.zip", "CustomLanguageFixes", [
     ("src/CustomLanguageFixes/bin/Release/net9.0/CustomLanguageFixes.dll", "CustomLanguageFixes.dll"),
     ("src/CustomLanguageFixes/manifest.json", "manifest.json"),
     ("src/CustomLanguageFixes/i18n/default.json", "i18n/default.json"),

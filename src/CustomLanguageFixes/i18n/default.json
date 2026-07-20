@@ -7,9 +7,9 @@
   "log.bundles-failed": "Failed to update bundle names: {{error}}",
 
   "config.clock.name": "Time format",
-  "config.clock.desc": "24h shows a 24-hour clock for custom languages; 12h keeps vanilla behavior.",
-  "config.recipe-suffix.name": "Localized (Recipe) suffix",
-  "config.recipe-suffix.desc": "Translates the (Recipe) suffix on item names. Only active for Ukrainian language packs.",
+  "config.clock.desc": "24-hour shows the time as 21:00. 12-hour shows it as 9:00 with an am/pm suffix.",
+  "config.clock.value-24h": "24-hour",
+  "config.clock.value-12h": "12-hour",
   "config.font-zoom.name": "Font zoom fix",
   "config.font-zoom.desc": "Keeps the language pack's font zoom instead of letting the game reset it.",
   "config.justify.name": "Justified dialogue text",
