@@ -1,12 +1,14 @@
 using CustomLanguage.Shared;
 using StardewModdingAPI;
-using StardewModdingAPI.Events;
 using StardewValley;
 
 namespace CustomLanguageBundleFix
 {
     public class ModConfig
     {
+        // Єдина опція мода — аварійний вимикач у config.json, у GMCM не виводиться:
+        // вимикати сам фікс нема сенсу, а назви, вже локалізовані в поточній сесії,
+        // повернуться англійськими лише після перезавантаження сейва.
         public bool BundleNamesFix { get; set; } = true;
     }
 
@@ -24,20 +26,6 @@ namespace CustomLanguageBundleFix
                 if (Context.IsWorldReady)
                     BundlePatch.RefreshBundleNames();
             };
-            helper.Events.GameLoop.GameLaunched += OnGameLaunched;
-        }
-
-        private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
-        {
-            var gmcm = this.Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
-            if (gmcm == null)
-                return;
-
-            gmcm.Register(this.ModManifest, () => _config = new ModConfig(), () => this.Helper.WriteConfig(_config));
-            gmcm.AddBoolOption(this.ModManifest, () => _config.BundleNamesFix,
-                v => { _config.BundleNamesFix = v; if (v && Context.IsWorldReady) BundlePatch.RefreshBundleNames(); },
-                () => this.Helper.Translation.Get("config.bundles.name"),
-                () => this.Helper.Translation.Get("config.bundles.desc"));
         }
     }
 }

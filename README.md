@@ -35,7 +35,7 @@ The bundle bug is shared, though: the desktop `NetWorldState` has the same `_bun
 
 **PC:** install [SMAPI](https://smapi.io), unzip `CustomLanguageBundleFix-1.0.0.zip` into `Stardew Valley/Mods/`, run the game through SMAPI.
 
-**Optional:** install [Generic Mod Config Menu](https://www.nexusmods.com/stardewvalley/mods/5098) (Android port: NRTnarathip's [StardewValleyMods-Android](https://github.com/NRTnarathip/StardewValleyMods-Android)) to configure everything in-game instead of editing `config.json`.
+**Optional (Android):** install [Generic Mod Config Menu](https://www.nexusmods.com/stardewvalley/mods/5098) (Android port: NRTnarathip's [StardewValleyMods-Android](https://github.com/NRTnarathip/StardewValleyMods-Android)) to change settings in-game instead of editing `config.json`. The PC mod has no menu — its only setting is an escape hatch nobody needs to touch.
 
 ## Configuration
 
@@ -43,17 +43,19 @@ Every feature can be switched off. Edit `config.json` in the mod folder, or use 
 
 **Custom Language Fixes (Android):**
 
-| Setting | Default | Meaning |
-|---|---|---|
-| `PreferredLanguage` | `""` | `""` = auto (first installed pack), `"en"` = English, or a pack ID such as `"Pereclaw.ukrainizacija"` |
-| `Clock` | `"24h"` | `"24h"` = 24-hour HUD clock for custom languages; `"12h"` = vanilla behavior |
-| `LanguageMenu` | `true` | Show custom languages in the built-in language menu |
-| `RecipeSuffix` | `true` | Localized `(Recipe)` suffix (only active for `uk` packs) |
-| `FontZoomFix` | `true` | Keep the pack's font zoom |
-| `JustifyDialogue` | `true` | Justified dialogue text |
-| `BundleNamesFix` | `true` | Junimo bundle name fix |
+| Setting | Default | In GMCM | Meaning |
+|---|---|---|---|
+| `Clock` | `"24h"` | yes | `"24h"` = 24-hour clock for custom languages; `"12h"` = vanilla behavior |
+| `RecipeSuffix` | `true` | yes | Localized `(Recipe)` suffix (only active for `uk` packs) |
+| `FontZoomFix` | `true` | yes | Keep the pack's font zoom |
+| `JustifyDialogue` | `true` | yes | Justified dialogue text |
+| `PreferredLanguage` | `""` | no | `""` = auto (first installed pack), `"en"` = English, or a pack ID such as `"Pereclaw.ukrainizacija"`. Set by picking a language in the game's language menu |
+| `LanguageMenu` | `true` | no | Show custom languages in the built-in language menu |
+| `BundleNamesFix` | `true` | no | Junimo bundle name fix |
 
-**Custom Language Bundle Fix (PC):** a single `BundleNamesFix` setting, `true` by default.
+The last three are config-only escape hatches for troubleshooting a mod conflict — there's no reason to turn them off in normal play, and flipping them mid-session doesn't fully take effect (the language menu re-reads its setting the next time it opens, and already-localized bundle names only revert after a save reload).
+
+**Custom Language Bundle Fix (PC):** a single `BundleNamesFix` setting in `config.json`, `true` by default. No in-game menu — there is nothing worth switching off.
 
 ## Building
 
@@ -102,6 +104,7 @@ tools/stardew-font-editor.html  — in-browser editor for the game's .fnt fonts;
 
 ## Version history
 
+- **2.0.1** — GMCM menu trimmed to the four settings worth changing (`Clock` renamed to «Time format»); the language-menu and bundle-fix switches stay in `config.json` only. PC mod (1.0.1) drops its GMCM menu entirely
 - **2.0.0** — universal release: renamed from Солов'їна Долина, English-first with i18n (`default.json` + `uk.json`), per-feature config switches, in-game GMCM menu, and a separate PC mod sharing the bundle fix
 - **1.5.2** — bundles round 3: packs may gate their bundle translation on save state, so `AssetsInvalidated` is now handled and names rebuilt mid-session
 - **1.5.1** — bundles round 2: clear the static `localizedAssetNames` resolver (it survives `InvalidateCache`) and call `TranslateFields()` on mod→mod switches, which the game itself never does because the language code doesn't change

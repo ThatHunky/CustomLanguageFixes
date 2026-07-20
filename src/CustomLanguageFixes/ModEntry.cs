@@ -20,10 +20,15 @@ namespace CustomLanguageFixes
         // "" = авто (перша мод-мова), "en" = англійська, або Id мод-мови (напр. "Pereclaw.ukrainizacija")
         public string PreferredLanguage { get; set; } = "";
         public string Clock { get; set; } = "24h";      // "24h" | "12h" (12h = ваніль)
-        public bool LanguageMenu { get; set; } = true;   // мод-мови у вбудованому меню мов
         public bool RecipeSuffix { get; set; } = true;   // (Рецепт)/(Креслення), діє лише для uk
         public bool FontZoomFix { get; set; } = true;
         public bool JustifyDialogue { get; set; } = true;
+
+        // Не виводяться в GMCM — лише аварійні вимикачі в config.json.
+        // Зміна на льоту не дає повного ефекту: меню мов перечитує це при наступному
+        // відкритті, а вже локалізовані назви клунків повернуться англійськими
+        // тільки після перезавантаження сейва.
+        public bool LanguageMenu { get; set; } = true;
         public bool BundleNamesFix { get; set; } = true;
     }
 
@@ -82,17 +87,15 @@ namespace CustomLanguageFixes
             gmcm.AddTextOption(this.ModManifest, () => Config.Clock, v => Config.Clock = v,
                 () => H.Translation.Get("config.clock.name"), () => H.Translation.Get("config.clock.desc"),
                 new[] { "24h", "12h" });
-            gmcm.AddBoolOption(this.ModManifest, () => Config.LanguageMenu, v => Config.LanguageMenu = v,
-                () => H.Translation.Get("config.language-menu.name"), () => H.Translation.Get("config.language-menu.desc"));
             gmcm.AddBoolOption(this.ModManifest, () => Config.RecipeSuffix, v => Config.RecipeSuffix = v,
                 () => H.Translation.Get("config.recipe-suffix.name"), () => H.Translation.Get("config.recipe-suffix.desc"));
             gmcm.AddBoolOption(this.ModManifest, () => Config.FontZoomFix, v => Config.FontZoomFix = v,
                 () => H.Translation.Get("config.font-zoom.name"), () => H.Translation.Get("config.font-zoom.desc"));
             gmcm.AddBoolOption(this.ModManifest, () => Config.JustifyDialogue, v => Config.JustifyDialogue = v,
                 () => H.Translation.Get("config.justify.name"), () => H.Translation.Get("config.justify.desc"));
-            gmcm.AddBoolOption(this.ModManifest, () => Config.BundleNamesFix,
-                v => { Config.BundleNamesFix = v; if (v && Context.IsWorldReady) BundlePatch.RefreshBundleNames(); },
-                () => H.Translation.Get("config.bundles.name"), () => H.Translation.Get("config.bundles.desc"));
+            // LanguageMenu і BundleNamesFix у меню не виводимо: вимикати їх нема сенсу, а зміна
+            // на льоту все одно не дає очікуваного ефекту (див. коментарі в ModConfig).
+            // Обидві лишаються в config.json як аварійний вимикач при конфлікті з іншим модом.
         }
 
         // ---------- мовна логіка ----------

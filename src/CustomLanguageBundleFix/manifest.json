@@ -1,7 +1,7 @@
 {
   "Name": "Custom Language Bundle Fix",
   "Author": "ThatHunky & DID",
-  "Version": "1.0.0",
+  "Version": "1.0.1",
   "Description": "Junimo bundle names show in your custom (mod) language immediately - no more save-and-relog ritual.",
   "UniqueID": "ThatHunky.CustomLanguageBundleFix",
   "EntryDll": "CustomLanguageBundleFix.dll",
