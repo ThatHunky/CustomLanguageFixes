@@ -1,92 +1,153 @@
-# Солов'їна Долина (Solovyina Dolyna)
+# Custom Language Fixes
 
-> **Статус: у розробці, ще не опубліковано.** Реліз на Nexus Mods буде після фінального тестування. Технічна назва (manifest, DLL, UniqueID) — латинкою: `Solovyina Dolyna` / `ThatHunky.SolovyinaDolyna`.
+> **Status: in development, not yet released on Nexus Mods.** Previously known as «Солов'їна Долина» (Solovyina Dolyna) — still the Ukrainian name of the project.
 
-SMAPI-мод для **Android-версії Stardew Valley**, який лагодить усе, що мобільний порт ламає для кастомних (мод-) мов — насамперед для українського перекладу [Pereclaw.ukrainizacija]. Один мод замість розсипу дрібних фіксів. «Солов'їна мова» + Stardew Valley = Солов'їна Долина.
+Two SMAPI mods that fix what Stardew Valley breaks for **custom (mod) languages** — any language pack, not just Ukrainian. Everything is gated on «a custom language is active», so vanilla languages are never touched.
 
-Перевірено на: Stardew Valley **1.6.15.3** (Android build 245), SMAPI **4.3.2** ([форк NRTnarathip](https://github.com/NRTnarathip/SMAPI-Android-1.6)).
-
-## Що робить
-
-| Фіча | Проблема | Як полагоджено |
+| Mod | Platform | What it's for |
 |---|---|---|
-| **24h годинник на HUD** | Мобільний `DayTimeMoneyBox.draw()` — форкнутий код без гілки `mod` у switch по мовах: кастомна мова падає в default = 12h без am/pm | Harmony prefix: на час малювання HUD підміняється `_currentLangCode` `mod` → `de` (німецька гілка вже 24h), finalizer відкочує назад |
-| **Мод-мови у меню вибору мов** | Вбудоване мобільне `LanguageSelectionMenu` показує лише 12 зашитих мов | Постфікси на `SetupButtons`/`draw`/`releaseLeftClick`: рядки мод-мов домальовуються після MAGYAR з рідними `ButtonTexture` паків, скрол розширено, тапи ловляться. Кілька мов-паків одночасно — кожен своїм рядком |
-| **Пам'ять вибору мови** | Автоперемикання силою повертало укр., навіть якщо юзер свідомо вибрав іншу мову | Вибір (у т.ч. вбудованої мови) пишеться в `config.json` (`PreferredLanguage`) + у преференси гри й поважається при старті |
-| **«(Рецепт)» / «(Креслення)»** | Суфікс «(Recipe)» у назвах предметів не перекладався | Постфікс на `Object.DisplayName`: їжа (Category −7) → «(Рецепт)», решта → «(Креслення)». Тільки для мов з кодом `uk` — тайцям та іншим не заважає. Логіка — порт мода DID.RecipeUkrainizacija під Android |
-| **Зум шрифта** | Мобільний `SpriteText.SetFontPixelZoom()` без гілки `mod` затирає зум пака (3.3 → 3) | Постфікс відновлює `FontPixelZoom` пака після кожного перерахунку |
-| **Justify у діалогах** | Greedy word-wrap лишає рваний правий край (українські слова довгі) | Власний рендерер поверх ванільного: пробіли розтягуються до рівного краю (макс 1.5× ширини пробілу), останній рядок абзацу не чіпається, друкарська машинка й варіанти відповідей працюють як ванільні, будь-який exception → мовчазний fallback |
-| **Назви клунків Джунімо** | Клунки лишаються англійськими до збереження+перезаходу: `Data\Bundles` кешується англійським ще до застосування мод-мови, а кеш назв у `NetWorldState` перебудовується лише раз за сесію | На `SaveLoaded` (і при зміні мови в сесії) інвалідується кеш `Data/Bundles` + `Strings/BundleNames`, кеш назв позначається брудним → `UpdateBundleDisplayNames()` перечитує вже локалізований асет. Прогрес і remixed-бандли не зачіпаються |
+| **Custom Language Fixes (Android)** | Android (SMAPI [fork by NRTnarathip](https://github.com/NRTnarathip/SMAPI-Android-1.6)) | The mobile port forks a lot of UI code and forgets the `mod` language branch — seven separate breakages |
+| **Custom Language Bundle Fix** | PC (Windows/Linux/macOS) | On PC only one thing breaks: Junimo bundle names stay English |
 
-Усі патчі гейтяться на `CurrentLanguageCode == mod` — вбудованим мовам мод нічого не змінює.
+Tested on Stardew Valley **1.6.15.3** (Android build 245, SMAPI 4.3.2) and **1.6.15** (PC).
 
-## Встановлення
+## Custom Language Fixes (Android)
 
-1. Постав [SMAPI Launcher](https://github.com/NRTnarathip/SMAPI-Android-1.6) і гру 1.6.15.1+.
-2. Розпакуй zip з [releases/](releases/) у `StardewValley/Mods/` (поряд з укр. перекладом).
-3. Перезапусти гру через SMAPI Launcher. Мова вибирається у меню мов (бульбашка на титулці) — «УКРАЇНСЬКА» буде внизу списку.
+| Feature | Problem | Fix |
+|---|---|---|
+| **24h HUD clock** | The mobile `DayTimeMoneyBox.draw()` is forked code with no `mod` branch in its language switch, so custom languages fall through to the 12h default | Harmony prefix swaps `_currentLangCode` from `mod` to `de` (whose branch is already 24h) for the duration of the draw call; a finalizer restores it |
+| **Custom languages in the language menu** | The built-in mobile `LanguageSelectionMenu` only lists 12 hardcoded languages | Postfixes on `SetupButtons`/`draw`/`releaseLeftClick` append a row per installed pack (using each pack's own `ButtonTexture`), extend the scroll area, and handle taps. Multiple packs each get their own row |
+| **Language memory** | Auto-switching forced the pack language back even when the player deliberately picked another one | The choice (including vanilla languages) is written to `config.json` and to the game's preferences, and respected on startup |
+| **Localized «(Recipe)» suffix** | The `(Recipe)` suffix on item names was left untranslated | Postfix on `Object.DisplayName`: food (category −7) gets «(Рецепт)», everything else «(Креслення)». Only runs for packs with language code `uk` — other languages are unaffected. Ported from DID's desktop mod RecipeUkrainizacija |
+| **Font zoom** | Mobile `SpriteText.SetFontPixelZoom()` has no `mod` branch and overwrites the pack's zoom (3.3 → 3) | Postfix restores the pack's `FontPixelZoom` after every recalculation |
+| **Justified dialogue** | Greedy word wrap leaves a ragged right edge, which is very visible with long words | Custom renderer on top of the vanilla one: spaces stretch to even out the edge (max 1.5× space width), the last line of a paragraph is left alone, typewriter effect and response options behave as usual, and any exception falls back to vanilla silently |
+| **Junimo bundle names** | Bundles stay English until you save and reload: `Data/Bundles` is cached in English before the custom language is applied, and `NetWorldState`'s name cache is rebuilt only once per session | On `SaveLoaded` (and whenever the language changes mid-session) the mod clears the static localized-asset resolver, invalidates `Data/Bundles` + `Strings/BundleNames`, and marks the name cache dirty so `UpdateBundleDisplayNames()` re-reads the localized asset. It also listens for mid-session asset invalidations, because a pack may enable its bundle translation based on save state. Bundle progress and remixed bundles are never touched — `SetBundleData` is never called |
 
-## Збірка
+## Custom Language Bundle Fix (PC)
 
-Потрібні **андроїдні** DLL з APK (десктопні не підійдуть — мобільний UI форкнутий):
+One feature: the Junimo bundle name fix described above. The rest of the Android list is mobile-only — the desktop game already handles custom languages correctly in its menus, clock, and font handling.
+
+The bundle bug is shared, though: the desktop `NetWorldState` has the same `_bundleDataDirty` / `UpdateBundleDisplayNames()` internals, so both mods compile the same `src/Shared/BundlePatch.cs`.
+
+## Installation
+
+**Android:** install the [SMAPI Launcher](https://github.com/NRTnarathip/SMAPI-Android-1.6) and game 1.6.15.1+, unzip `CustomLanguageFixes-2.0.0.zip` from [releases/](releases/) into `StardewValley/Mods/` (next to your language pack), and restart through the launcher. Pick your language from the globe button on the title screen — custom languages are at the bottom of the list.
+
+**PC:** install [SMAPI](https://smapi.io), unzip `CustomLanguageBundleFix-1.0.0.zip` into `Stardew Valley/Mods/`, run the game through SMAPI.
+
+**Optional:** install [Generic Mod Config Menu](https://www.nexusmods.com/stardewvalley/mods/5098) (Android port: NRTnarathip's [StardewValleyMods-Android](https://github.com/NRTnarathip/StardewValleyMods-Android)) to configure everything in-game instead of editing `config.json`.
+
+## Configuration
+
+Every feature can be switched off. Edit `config.json` in the mod folder, or use the in-game GMCM menu.
+
+**Custom Language Fixes (Android):**
+
+| Setting | Default | Meaning |
+|---|---|---|
+| `PreferredLanguage` | `""` | `""` = auto (first installed pack), `"en"` = English, or a pack ID such as `"Pereclaw.ukrainizacija"` |
+| `Clock` | `"24h"` | `"24h"` = 24-hour HUD clock for custom languages; `"12h"` = vanilla behavior |
+| `LanguageMenu` | `true` | Show custom languages in the built-in language menu |
+| `RecipeSuffix` | `true` | Localized `(Recipe)` suffix (only active for `uk` packs) |
+| `FontZoomFix` | `true` | Keep the pack's font zoom |
+| `JustifyDialogue` | `true` | Justified dialogue text |
+| `BundleNamesFix` | `true` | Junimo bundle name fix |
+
+**Custom Language Bundle Fix (PC):** a single `BundleNamesFix` setting, `true` by default.
+
+## Building
+
+**Android** needs the *mobile* assemblies — desktop ones won't do, since the mobile UI code is forked. Extract them from the APK:
 
 ```bash
-# витягнути APK з телефона і розпакувати асембліки (формат XALZ)
 adb shell pm path com.chucklefish.stardewvalley
 adb pull /data/app/.../base.apk
 unzip base.apk -d apk/ && pyxamstore unpack -d apk/assemblies/
 ```
 
-Поклади `StardewValley.dll`, `StardewValley.GameData.dll`, `StardewModdingAPI.dll` у `src/SolovyinaDolyna/libs/` (тека в .gitignore), далі:
+Put `StardewValley.dll`, `StardewValley.GameData.dll`, `StardewModdingAPI.dll` and `SMAPI.Toolkit.CoreInterfaces.dll` into `src/CustomLanguageFixes/libs/` (gitignored — game files are ConcernedApe's copyright), then:
 
 ```bash
-cd src/SolovyinaDolyna && dotnet build -c Release
+cd src/CustomLanguageFixes && dotnet build -c Release
 ```
 
-Таргет `net9.0`, Harmony 2.3.3 (з рантайму SMAPI, у збірку не пакується).
+**PC** needs `Stardew Valley.dll`, `StardewValley.GameData.dll`, `MonoGame.Framework.dll` from your game folder plus the same two SMAPI DLLs, all in `src/CustomLanguageBundleFix/libs/`:
 
-## Структура репозиторію
-
-```
-src/SolovyinaDolyna/     — сорси мода (ModEntry + ClockPatch + RecipePatch,
-                           LangMenuPatch, FontPatch, JustifyPatch)
-legacy/Mobile24hClockFix/— перший standalone-фікс годинника; функціонал повністю
-                           поглинутий ClockPatch, лишений як історія/мінімальний приклад
-releases/                — зібрані zip (поточний — ще під старою робочою назвою
-                           UkrainizacijaPlus; перший zip з новою назвою з'явиться
-                           з наступною збіркою)
-docs/Chat-history.md     — повна історія діагностики (декомпіл, пошук бага, ітерації)
-docs/ImproveGame-PR-description.md — опис PR до NRTnarathip/ImproveGame: зняти хардкод
-                           тайського ID з фікса годинника, щоб він працював для всіх мод-мов
-tools/stardew-font-editor.html — редактор .fnt-шрифтів гри (відкривається у браузері);
-                           онлайн: https://stardew-fonts.dobrovolskyi.com.ua
+```bash
+cd src/CustomLanguageBundleFix && dotnet build -c Release
 ```
 
-## Історія версій
+Both SMAPI DLLs come from the official SMAPI installer (`internal/windows/install.dat` is a zip containing them). Targets: `net9.0` (Android), `net6.0` (PC), Harmony 2.3.3 from the SMAPI runtime.
 
-- **1.5.2** — клунки, раунд 3: пак вмикає переклад `Data/Bundles.uk` за умовою стану сейва (зустрів клунки чи ні), тож CP підміняє асет посеред сесії — тепер ловимо `AssetsInvalidated` і перебудовуємо назви одразу, а не лише при завантаженні сейва
-- **1.5.1** — фікс фікса клунків: чистимо статичний `localizedAssetNames` (він переживає InvalidateCache); перемикання між двома мод-мовами тепер викликає `TranslateFields()` (гра сама цього не робить, бо код мови не змінюється)
-- **1.5.0** — локалізовані назви клунків Джунімо без ритуалу «збережись і перезайди»
-- **1.4.0** — justify для діалогів; перейменування Ukrainizacija Plus → Солов'їна Долина
-- **1.3.0** — фікс зуму шрифта (`SetFontPixelZoom`)
-- **1.2.x** — мод-мови у вбудованому меню мов (1.2.1 — плавний скрол через скісор скролбокса)
-- **1.1.0** — перемикач мов, мульти-паки, пам'ять вибору
-- **1.0.x** — 24h годинник + Рецепт/Креслення (порт DID.RecipeUkrainizacija під Android)
+Package releases with `python -X utf8 tools/pack_releases.py` — **never** with PowerShell `Compress-Archive`, which writes backslash paths that Android unpacks into broken files.
 
-## Підтримати
+## Repository structure
 
-Мод безплатний і таким лишиться. Якщо хочеться подякувати:
+```
+src/Shared/                    — code shared by both mods (BundlePatch, GMCM API interface)
+src/CustomLanguageFixes/       — Android mod (ModEntry + Clock, LangMenu, Recipe, Font, Justify patches)
+src/CustomLanguageBundleFix/   — PC mod (bundle fix only)
+legacy/Mobile24hClockFix/      — the original standalone clock fix, superseded by ClockPatch,
+                                 kept as history and as a minimal example
+releases/                      — built zips
+tools/pack_releases.py         — release packaging (python zipfile, forward slashes)
+docs/superpowers/specs/        — design docs
+docs/superpowers/plans/        — implementation plans
+docs/Chat-history.md           — full diagnosis history (decompilation, bug hunt, iterations)
+docs/ImproveGame-PR-description.md — PR description for NRTnarathip/ImproveGame: drop the hardcoded
+                                 Thai ID from the clock fix so it works for every custom language
+tools/stardew-font-editor.html  — in-browser editor for the game's .fnt fonts;
+                                 online: https://stardew-fonts.dobrovolskyi.com.ua
+```
 
-[![Донат — монобанка](https://img.shields.io/badge/%D0%9F%D1%96%D0%B4%D1%82%D1%80%D0%B8%D0%BC%D0%B0%D1%82%D0%B8-%D0%BC%D0%BE%D0%BD%D0%BE%D0%B1%D0%B0%D0%BD%D0%BA%D0%B0-black?style=for-the-badge)](https://send.monobank.ua/jar/9WQuPLcBwx)
+## Version history
 
-Картка банки: `4874 1000 3082 2038`
+- **2.0.0** — universal release: renamed from Солов'їна Долина, English-first with i18n (`default.json` + `uk.json`), per-feature config switches, in-game GMCM menu, and a separate PC mod sharing the bundle fix
+- **1.5.2** — bundles round 3: packs may gate their bundle translation on save state, so `AssetsInvalidated` is now handled and names rebuilt mid-session
+- **1.5.1** — bundles round 2: clear the static `localizedAssetNames` resolver (it survives `InvalidateCache`) and call `TranslateFields()` on mod→mod switches, which the game itself never does because the language code doesn't change
+- **1.5.0** — localized Junimo bundle names without the save-and-relog ritual
+- **1.4.0** — justified dialogue; renamed Ukrainizacija Plus → Солов'їна Долина
+- **1.3.0** — font zoom fix (`SetFontPixelZoom`)
+- **1.2.x** — custom languages in the built-in language menu (1.2.1 — smooth scrolling via the scrollbox scissor)
+- **1.1.0** — language switcher, multiple packs, remembered choice
+- **1.0.x** — 24h clock + Recipe/Blueprint suffix (port of DID.RecipeUkrainizacija to Android)
 
-## Ліцензія
+## Support
 
-Код мода — [MIT](LICENSE). Ліцензія покриває лише код у цьому репозиторії; файли гри (DLL, ресурси) належать ConcernedApe і в репо не входять.
+The mod is free and will stay free. If you'd like to say thanks:
 
-## Подяки
+[![Donate — monobank](https://img.shields.io/badge/Support-monobank-black?style=for-the-badge)](https://send.monobank.ua/jar/9WQuPLcBwx)
 
-- **Pereclaw** — український переклад `Pereclaw.ukrainizacija`, з ідеально прописаним `content.json` (баг був у грі, не в паку)
-- **DID** — оригінальний RecipeUkrainizacija (десктоп)
-- **NRTnarathip** — SMAPI для Android і ImproveGame; фікс годинника по-хорошому має жити там (див. `docs/ImproveGame-PR-description.md`)
+Card: `4874 1000 3082 2038`
+
+## License
+
+[MIT](LICENSE). The license covers only the code in this repository; game files (DLLs, assets) belong to ConcernedApe and are not included.
+
+## Credits
+
+- **Pereclaw** — the `Pereclaw.ukrainizacija` Ukrainian translation, with a perfectly written `content.json` (the bug was in the game, not the pack)
+- **DID** — the original desktop RecipeUkrainizacija, and all the mobile testing
+- **NRTnarathip** — SMAPI for Android, ImproveGame, and the GMCM port; the clock fix arguably belongs there (see `docs/ImproveGame-PR-description.md`)
+- **spacechase0** — Generic Mod Config Menu
+
+---
+
+## Українською
+
+**Два SMAPI-моди, які лагодять те, що гра ламає для кастомних (мод-) мов** — для будь-якого мовного пака, не лише українського. Раніше проєкт називався «Солов'їна Долина»; українська назва лишається.
+
+- **Custom Language Fixes (Android)** — сім фіксів мобільного порту: 24-годинний годинник на HUD, мод-мови у вбудованому меню вибору мов, пам'ять вибору мови, суфікс «(Рецепт)/(Креслення)», зум шрифта пака, рівний правий край у діалогах і локалізовані назви клунків Джунімо.
+- **Custom Language Bundle Fix (ПК)** — лише назви клунків: на десктопі решта працює з коробки.
+
+**Статус:** у розробці, на Nexus ще не опубліковано.
+
+**Встановлення (Android):** постав [SMAPI Launcher](https://github.com/NRTnarathip/SMAPI-Android-1.6), розпакуй `CustomLanguageFixes-2.0.0.zip` з [releases/](releases/) у `StardewValley/Mods/` поряд з мовним паком, перезапусти гру через лаунчер. Мова вибирається кнопкою-бульбашкою на титулці — кастомні мови внизу списку.
+
+**Встановлення (ПК):** постав [SMAPI](https://smapi.io), розпакуй `CustomLanguageBundleFix-1.0.0.zip` у `Stardew Valley/Mods/`.
+
+**Налаштування:** кожну фічу можна вимкнути в `config.json` (таблиця вище) або в грі через [Generic Mod Config Menu](https://www.nexusmods.com/stardewvalley/mods/5098) — на Android є порт від NRTnarathip.
+
+**Про клунки:** якщо мовний пак вмикає переклад клунків залежно від стану сейва (як укр. пак Pereclaw — це захист від [SMAPI #812](https://github.com/Pathoschild/SMAPI/issues/812)), то у свіжому сейві назви стануть українськими після першої ночі — мод ловить момент, коли пак вмикає переклад, і перебудовує назви сам. Раніше для цього треба було зберегтися, вийти в меню і зайти заново.
+
+**Підтримати:** [монобанка](https://send.monobank.ua/jar/9WQuPLcBwx), картка `4874 1000 3082 2038`.
