@@ -2,7 +2,7 @@ using HarmonyLib;
 using StardewValley;
 using StardewValley.BellsAndWhistles;
 
-namespace SolovyinaDolyna
+namespace CustomLanguageFixes
 {
     // Мобільний SpriteText.SetFontPixelZoom() не має гілки mod і затирає зум пака (3.3 -> 3)
     // при кожному shrinkFont(). Через це wrap міряється одним зумом, а малюється іншим -> діри

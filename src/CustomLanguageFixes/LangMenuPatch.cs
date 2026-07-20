@@ -7,7 +7,7 @@ using StardewValley;
 using StardewValley.GameData;
 using StardewValley.Menus;
 
-namespace SolovyinaDolyna
+namespace CustomLanguageFixes
 {
     // Інтегрує мод-мови у вбудоване мобільне LanguageSelectionMenu (кнопка-бульбашка на титулці).
     // Вбудований список — хардкод 12 мов; докидаємо свої рядки знизу, розширюємо скрол і ловимо тапи.

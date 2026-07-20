@@ -7,7 +7,7 @@ using StardewValley;
 using StardewValley.BellsAndWhistles;
 using StardewValley.Menus;
 
-namespace SolovyinaDolyna
+namespace CustomLanguageFixes
 {
     // Justify для тексту діалогів (мод-мова): розтягуємо пробіли так, щоб правий край був рівний.
     // Перехоплюємо SpriteText.drawString ТІЛЬКИ коли він викликаний з DialogueBox.draw для основного

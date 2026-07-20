@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <LangVersion>latest</LangVersion>
-    <AssemblyName>SolovyinaDolyna</AssemblyName>
+    <AssemblyName>CustomLanguageFixes</AssemblyName>
     <Nullable>disable</Nullable>
     <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
   </PropertyGroup>

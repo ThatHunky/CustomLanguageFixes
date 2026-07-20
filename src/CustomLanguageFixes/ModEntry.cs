@@ -12,7 +12,7 @@ using StardewValley.GameData;
 using StardewValley.Menus;
 using SObject = StardewValley.Object;
 
-namespace SolovyinaDolyna
+namespace CustomLanguageFixes
 {
     public class ModConfig
     {
@@ -32,7 +32,7 @@ namespace SolovyinaDolyna
             H = helper;
             Config = helper.ReadConfig<ModConfig>();
 
-            var harmony = new Harmony("ThatHunky.SolovyinaDolyna");
+            var harmony = new Harmony("ThatHunky.CustomLanguageFixes");
             ClockPatch.Apply(harmony);   // 24h HUD-годинник для мод-мов
             RecipePatch.Apply(harmony);  // (Рецепт)/(Креслення) — тільки для укр. мод-мови
             LangMenuPatch.Apply(harmony); // мод-мови у вбудованому меню вибору мов
