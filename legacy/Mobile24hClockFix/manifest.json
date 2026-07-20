@@ -1,0 +1,10 @@
+{
+  "Name": "Mobile 24h Clock Fix",
+  "Author": "ThatHunky",
+  "Version": "1.0.0",
+  "Description": "Fixes the Android HUD clock ignoring ClockTimeFormat for custom (mod) languages by routing DayTimeMoneyBox.draw through the 24h branch.",
+  "UniqueID": "ThatHunky.Mobile24hClockFix",
+  "EntryDll": "Mobile24hClockFix.dll",
+  "MinimumApiVersion": "4.0.0",
+  "UpdateKeys": []
+}

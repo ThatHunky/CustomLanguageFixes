@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>SolovyinaDolyna</AssemblyName>
+    <Nullable>disable</Nullable>
+    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Lib.Harmony" Version="2.3.3" ExcludeAssets="runtime" />
+    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.*" ExcludeAssets="runtime" />
+    <Reference Include="StardewValley"><HintPath>libs/StardewValley.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="StardewValley.GameData"><HintPath>libs/StardewValley.GameData.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="StardewModdingAPI"><HintPath>libs/StardewModdingAPI.dll</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+</Project>
