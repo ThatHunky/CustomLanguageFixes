@@ -189,13 +189,52 @@ namespace SolovyinaDolyna
     // до застосування мод-мови, а кеш _bundleData перебудовується лише раз за сесію ---
     internal static class BundlePatch
     {
+        private static bool _rebuilding;
+
         public static void Apply(IModHelper helper)
         {
             helper.Events.GameLoop.SaveLoaded += (_, _) => RefreshBundleNames();
+            // пак вмикає переклад клунків за умовою стану сейва (зустрів клунки чи ні),
+            // тому CP може підмінити Data/Bundles посеред сесії — ловимо і перебудовуємо
+            helper.Events.Content.AssetsInvalidated += (_, e) =>
+            {
+                if (!Context.IsWorldReady || _rebuilding)
+                    return;
+                foreach (var n in e.Names)
+                {
+                    string name = n.Name.Replace('\\', '/');
+                    if (name.StartsWith("Data/Bundles", StringComparison.OrdinalIgnoreCase))
+                    {
+                        RebuildNames();
+                        break;
+                    }
+                }
+            };
+        }
+
+        // перебудувати кеш назв зі свіжого асета (без інвалідацій — щоб не зациклитись)
+        private static void RebuildNames()
+        {
+            try
+            {
+                if (LocalizedContentManager.CurrentLanguageCode != LocalizedContentManager.LanguageCode.mod)
+                    return;
+                var ws = Game1.netWorldState?.Value;
+                if (ws == null)
+                    return;
+                AccessTools.Field(ws.GetType(), "_bundleDataDirty")?.SetValue(ws, true);
+                _ = ws.BundleData;
+                ModEntry.Log.Log("Назви клунків перебудовано після оновлення асета.", LogLevel.Trace);
+            }
+            catch (Exception ex)
+            {
+                ModEntry.Log.Log("Не вдалося перебудувати назви клунків: " + ex.Message, LogLevel.Warn);
+            }
         }
 
         internal static void RefreshBundleNames()
         {
+            _rebuilding = true;
             try
             {
                 if (LocalizedContentManager.CurrentLanguageCode != LocalizedContentManager.LanguageCode.mod)
@@ -223,6 +262,10 @@ namespace SolovyinaDolyna
             catch (Exception ex)
             {
                 ModEntry.Log.Log("Не вдалося оновити назви клунків: " + ex.Message, LogLevel.Warn);
+            }
+            finally
+            {
+                _rebuilding = false;
             }
         }
     }
