@@ -75,7 +75,10 @@ namespace CustomLanguageFixes
             if (gmcm == null)
                 return; // GMCM не встановлено — лишається config.json
 
-            gmcm.Register(this.ModManifest, () => Config = new ModConfig(), () => H.WriteConfig(Config));
+            // Default у GMCM скидає перемикачі, але НЕ пам'ять вибору мови — цієї опції в меню не видно
+            gmcm.Register(this.ModManifest,
+                () => Config = new ModConfig { PreferredLanguage = Config.PreferredLanguage },
+                () => H.WriteConfig(Config));
             gmcm.AddTextOption(this.ModManifest, () => Config.Clock, v => Config.Clock = v,
                 () => H.Translation.Get("config.clock.name"), () => H.Translation.Get("config.clock.desc"),
                 new[] { "24h", "12h" });
@@ -154,31 +157,6 @@ namespace CustomLanguageFixes
             {
                 Log.Log(H.Translation.Get("log.language-switch-failed", new { error = ex.Message }), LogLevel.Error);
             }
-        }
-
-        private static void CycleLanguage()
-        {
-            var langs = GetModLanguages();
-            if (langs.Count == 0)
-                return;
-            // цикл: en -> langs[0] -> langs[1] -> ... -> en
-            if (LocalizedContentManager.CurrentLanguageCode != LocalizedContentManager.LanguageCode.mod)
-            {
-                SwitchTo(langs[0]);
-                return;
-            }
-            int i = langs.FindIndex(l => l.Id == LocalizedContentManager.CurrentModLanguage?.Id);
-            if (i >= 0 && i < langs.Count - 1)
-                SwitchTo(langs[i + 1]);
-            else
-                SwitchTo(null); // en
-        }
-
-        private static string CurrentLabel()
-        {
-            if (LocalizedContentManager.CurrentLanguageCode == LocalizedContentManager.LanguageCode.mod)
-                return (LocalizedContentManager.CurrentModLanguage?.LanguageCode ?? "mod").ToUpperInvariant();
-            return LocalizedContentManager.CurrentLanguageCode.ToString().ToUpperInvariant();
         }
 
     }

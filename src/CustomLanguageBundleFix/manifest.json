@@ -6,5 +6,5 @@
   "UniqueID": "ThatHunky.CustomLanguageBundleFix",
   "EntryDll": "CustomLanguageBundleFix.dll",
   "MinimumApiVersion": "4.0.0",
-  "UpdateKeys": ["GitHub:ThatHunky/CustomLanguageFixes"]
+  "UpdateKeys": []
 }
