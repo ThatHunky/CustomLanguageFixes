@@ -95,9 +95,19 @@ namespace SolovyinaDolyna
             try
             {
                 if (lang == null)
+                {
                     LocalizedContentManager.CurrentLanguageCode = LocalizedContentManager.LanguageCode.en; // property => OnLanguageChange => перезавантаження рядків
+                }
                 else
+                {
+                    // mod→mod (напр. білоруська→українська) не змінює код мови, тому
+                    // OnLanguageChange не спрацює і гра сама не перезавантажить рядки/резолвер
+                    bool silentSwitch = LocalizedContentManager.CurrentLanguageCode == LocalizedContentManager.LanguageCode.mod
+                        && LocalizedContentManager.CurrentModLanguage?.Id != lang.Id;
                     LocalizedContentManager.SetModLanguage(lang);
+                    if (silentSwitch)
+                        Game1.game1?.TranslateFields(); // робить localizedAssetNames.Clear() + перевантажує кешовані рядки/шрифти
+                }
 
                 var prefs = new StartupPreferences();
                 prefs.loadPreferences(false, true);
@@ -193,6 +203,11 @@ namespace SolovyinaDolyna
                 var ws = Game1.netWorldState?.Value;
                 if (ws == null)
                     return;
+
+                // резолвер локалізованих асетів — статичний і чиститься лише при зміні
+                // КОДУ мови чи виході в меню; застиглий маршрут «Data\Bundles → база (en)»
+                // переживає і перемикання mod→mod, і InvalidateCache — чистимо самі
+                LocalizedContentManager.localizedAssetNames.Clear();
 
                 // скинути закешований (ще англійський) асет — і сам словник, і фолбек назв
                 ModEntry.H.GameContent.InvalidateCache("Data/Bundles");

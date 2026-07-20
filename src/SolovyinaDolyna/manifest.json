@@ -1,7 +1,7 @@
 {
   "Name": "Solovyina Dolyna",
   "Author": "ThatHunky & DID",
-  "Version": "1.5.0",
+  "Version": "1.5.1",
   "Description": "Солов'їна Долина: мод-мови у меню вибору мов, пам'ять вибору, 24h годинник на HUD, Рецепт/Креслення, зум шрифта, justify діалогів, локалізовані назви клунків.",
   "UniqueID": "ThatHunky.SolovyinaDolyna",
   "EntryDll": "SolovyinaDolyna.dll",
