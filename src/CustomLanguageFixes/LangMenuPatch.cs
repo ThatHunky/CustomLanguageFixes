@@ -135,7 +135,7 @@ namespace CustomLanguageFixes
                 prefs.savePreferences(false, true);
                 ModEntry.Config.PreferredLanguage = _langs[i].Id;
                 ModEntry.H.WriteConfig(ModEntry.Config);
-                ModEntry.Log.Log($"Мову вибрано в меню: {_langs[i].Id}", StardewModdingAPI.LogLevel.Info);
+                ModEntry.Log.Log(ModEntry.H.Translation.Get("log.language-picked", new { id = _langs[i].Id }), StardewModdingAPI.LogLevel.Info);
                 __instance.exitThisMenu();
                 return;
             }

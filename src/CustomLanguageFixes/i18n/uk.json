@@ -1,0 +1,21 @@
+{
+  "log.language-switched": "Мову перемкнуто на: {{id}}",
+  "log.language-switch-failed": "Помилка перемикання мови: {{error}}",
+  "log.language-picked": "Мову вибрано в меню: {{id}}",
+  "log.bundles-refreshed": "Назви клунків перелокалізовано.",
+  "log.bundles-rebuilt": "Назви клунків перебудовано після оновлення асета.",
+  "log.bundles-failed": "Не вдалося оновити назви клунків: {{error}}",
+
+  "config.clock.name": "Формат годинника на HUD",
+  "config.clock.desc": "24h — 24-годинний годинник для кастомних мов; 12h — як у ванілі.",
+  "config.language-menu.name": "Мод-мови в меню вибору мов",
+  "config.language-menu.desc": "Показувати встановлені мовні паки у вбудованому меню вибору мови.",
+  "config.recipe-suffix.name": "Локалізований суфікс (Рецепт)",
+  "config.recipe-suffix.desc": "Перекладає суфікс (Recipe) у назвах предметів. Діє лише для українських паків.",
+  "config.font-zoom.name": "Фікс зуму шрифта",
+  "config.font-zoom.desc": "Зберігає зум шрифта мовного пака, не даючи грі його скинути.",
+  "config.justify.name": "Рівний край тексту діалогів",
+  "config.justify.desc": "Розтягує пробіли, щоб правий край тексту діалогів був рівним.",
+  "config.bundles.name": "Фікс назв клунків Джунімо",
+  "config.bundles.desc": "Локалізує назви клунків одразу, без ритуалу «збережись і перезайди»."
+}

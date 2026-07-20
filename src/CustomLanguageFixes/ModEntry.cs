@@ -122,11 +122,11 @@ namespace CustomLanguageFixes
 
                 Config.PreferredLanguage = lang?.Id ?? "en";
                 H.WriteConfig(Config);
-                Log.Log($"Мову перемкнуто на: {(lang?.Id ?? "en")}", LogLevel.Info);
+                Log.Log(H.Translation.Get("log.language-switched", new { id = lang?.Id ?? "en" }), LogLevel.Info);
             }
             catch (Exception ex)
             {
-                Log.Log("Помилка перемикання мови: " + ex.Message, LogLevel.Error);
+                Log.Log(H.Translation.Get("log.language-switch-failed", new { error = ex.Message }), LogLevel.Error);
             }
         }
 
