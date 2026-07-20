@@ -19,6 +19,8 @@ namespace CustomLanguageFixes
 
         private static void Postfix()
         {
+            if (!ModEntry.Config.FontZoomFix)
+                return;
             if (LocalizedContentManager.CurrentLanguageCode != LocalizedContentManager.LanguageCode.mod)
                 return; // гейт на mod, бо CurrentModLanguage може лишатись не-null після перемикання на вбудовану
             var lang = LocalizedContentManager.CurrentModLanguage;

@@ -19,6 +19,12 @@ namespace CustomLanguageFixes
     {
         // "" = авто (перша мод-мова), "en" = англійська, або Id мод-мови (напр. "Pereclaw.ukrainizacija")
         public string PreferredLanguage { get; set; } = "";
+        public string Clock { get; set; } = "24h";      // "24h" | "12h" (12h = ваніль)
+        public bool LanguageMenu { get; set; } = true;   // мод-мови у вбудованому меню мов
+        public bool RecipeSuffix { get; set; } = true;   // (Рецепт)/(Креслення), діє лише для uk
+        public bool FontZoomFix { get; set; } = true;
+        public bool JustifyDialogue { get; set; } = true;
+        public bool BundleNamesFix { get; set; } = true;
     }
 
     public class ModEntry : Mod
@@ -39,7 +45,7 @@ namespace CustomLanguageFixes
             LangMenuPatch.Apply(harmony); // мод-мови у вбудованому меню вибору мов
             FontPatch.Apply(harmony);     // зум шрифта пака не затирається shrinkFont'ом
             JustifyPatch.Apply(harmony);  // рівний правий край тексту діалогів (justify)
-            BundlePatch.Apply(helper, this.Monitor, () => true); // локалізовані назви клунків одразу
+            BundlePatch.Apply(helper, this.Monitor, () => Config.BundleNamesFix); // локалізовані назви клунків одразу
 
             helper.Events.Content.AssetReady += OnAssetReady;          // застосувати мову при старті
             LocalizedContentManager.OnLanguageChange += OnLanguageChanged; // запам'ятати вибір з вбудованого меню
@@ -170,6 +176,8 @@ namespace CustomLanguageFixes
         private static void DrawPrefix(ref bool __state)
         {
             __state = false;
+            if (!string.Equals(ModEntry.Config.Clock, "24h", StringComparison.OrdinalIgnoreCase))
+                return;
             var current = (LocalizedContentManager.LanguageCode)LangField.GetValue(null);
             if (current == LocalizedContentManager.LanguageCode.mod)
             {
@@ -201,6 +209,8 @@ namespace CustomLanguageFixes
         {
             try
             {
+                if (!ModEntry.Config.RecipeSuffix)
+                    return;
                 if (LocalizedContentManager.CurrentLanguageCode != LocalizedContentManager.LanguageCode.mod)
                     return;
                 // суфікси українські — не чіпаємо інші мод-мови (тайську і т.д.)

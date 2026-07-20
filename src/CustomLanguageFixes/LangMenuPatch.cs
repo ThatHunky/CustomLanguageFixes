@@ -39,6 +39,12 @@ namespace CustomLanguageFixes
 
         private static void SetupPostfix(LanguageSelectionMenu __instance)
         {
+            if (!ModEntry.Config.LanguageMenu)
+            {
+                _langs = new();
+                _textures = null;
+                return;
+            }
             try
             {
                 _langs = Game1.content.Load<List<ModLanguage>>("Data\\AdditionalLanguages") ?? new();

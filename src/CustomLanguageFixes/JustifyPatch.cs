@@ -36,7 +36,7 @@ namespace CustomLanguageFixes
             int characterPosition, int width, int height, float alpha, float layerDepth,
             bool junimoText, int drawBGScroll, string placeHolderScrollWidthText, Color? color)
         {
-            if (!_inDialogueDraw || _rendering
+            if (!ModEntry.Config.JustifyDialogue || !_inDialogueDraw || _rendering
                 || LocalizedContentManager.CurrentLanguageCode != LocalizedContentManager.LanguageCode.mod
                 || width <= 0 || characterPosition == 999999 || string.IsNullOrEmpty(s))
                 return true; // не наш випадок — ванільний рендер
