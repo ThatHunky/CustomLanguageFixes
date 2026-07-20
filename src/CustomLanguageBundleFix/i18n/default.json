@@ -1,0 +1,7 @@
+{
+  "log.bundles-refreshed": "Bundle names relocalized.",
+  "log.bundles-rebuilt": "Bundle names rebuilt after asset update.",
+  "log.bundles-failed": "Failed to update bundle names: {{error}}",
+  "config.bundles.name": "Junimo bundle names fix",
+  "config.bundles.desc": "Localizes Junimo bundle names immediately, without the save-and-relog ritual."
+}
