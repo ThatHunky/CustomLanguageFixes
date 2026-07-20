@@ -1,0 +1,46 @@
+[size=4][b]Junimo bundle names in your language, immediately — no save-and-reload ritual.[/b][/size]
+
+If you play with a community translation (a custom «mod» language), the Community Center bundle names stay in English until you save the game, quit to the title screen and load again. After that they're translated — until the next time it happens.
+
+This mod fixes that. Bundle names are localized as soon as the save loads.
+
+[line]
+
+[size=4][b]Why it happens[/b][/size]
+
+The game caches [b]Data/Bundles[/b] in English before your custom language is applied, and the display-name cache inside the world state is only rebuilt once per session. So the English names get baked in and stay there for as long as you're playing.
+
+The mod clears the cached asset resolution, invalidates the bundle data, and marks the name cache dirty so the game re-reads the localized asset it should have used in the first place. It also watches for translations that a language pack enables partway through a session — some packs only switch their bundle translation on once a save has bundle data, and the mod picks that up as soon as it happens.
+
+[b]Your bundle progress is never touched.[/b] The mod only refreshes display names; it never writes bundle data back, so remixed bundles and completion state are safe.
+
+[line]
+
+[size=4][b]Requirements[/b][/size]
+
+[list]
+[*][b]SMAPI[/b] 4.0 or newer.
+[*][b]A language pack[/b] — any custom language mod. With a built-in game language this mod does nothing.
+[/list]
+
+[size=4][b]Installation[/b][/size]
+
+Unzip into your [b]Mods[/b] folder and run the game through SMAPI. There is nothing to configure.
+
+[i]On Android?[/i] Use «Custom Language Fixes» instead — it includes this fix plus everything else the mobile port breaks for custom languages.
+
+[line]
+
+Source code: [url=https://github.com/ThatHunky/CustomLanguageFixes]github.com/ThatHunky/CustomLanguageFixes[/url]. Licensed MIT.
+
+Credits: [b]Pereclaw[/b] for the Ukrainian translation this was diagnosed against, and [b]DID[/b] for testing.
+
+[line]
+
+[size=4][b]Українською[/b][/size]
+
+Назви клунків Джунімо українською (чи будь-якою іншою мод-мовою) одразу після завантаження сейва — без ритуалу «збережись, вийди в меню, зайди знову».
+
+Гра кешує Data/Bundles англійською ще до застосування мод-мови, а кеш назв перебудовує лише раз за сесію. Мод скидає ці кеші й змушує гру перечитати локалізований асет. Прогрес клунків не зачіпається — мод змінює тільки відображувані назви.
+
+Потрібні SMAPI 4.0+ і будь-який мовний пак. Налаштовувати нічого не треба.

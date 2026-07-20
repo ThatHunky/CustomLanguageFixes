@@ -1,0 +1,64 @@
+[size=4][b]Everything the Android port breaks for custom (mod) languages, fixed in one mod.[/b][/size]
+
+Stardew Valley's mobile port forks a lot of its UI code, and in several places that forked code simply has no branch for the [b]mod[/b] language — the one every community translation uses. The result is a pile of small breakages that make custom translations feel broken. This mod fixes all of them.
+
+It works with [b]any[/b] language pack, not a specific one. Every patch is gated on «a custom language is active», so if you play in a built-in language this mod changes nothing at all.
+
+[line]
+
+[size=4][b]What it fixes[/b][/size]
+
+[list]
+[*][b]The HUD clock.[/b] Custom languages fall through to a 12-hour clock with no am/pm suffix at all, so 9:00 and 21:00 look identical. You now get a proper 24-hour clock, or a real 12-hour clock with a localized am/pm suffix — your choice.
+[*][b]The language menu.[/b] The built-in mobile language selection menu only lists 12 hardcoded languages, so installed packs are invisible. They're now added to the list, each with its own button graphic, and the menu scrolls properly. Multiple packs each get their own row.
+[*][b]Language memory.[/b] Your choice is remembered and respected on startup — including a deliberate switch back to a built-in language.
+[*][b]Font zoom.[/b] The mobile font code overwrites the zoom your pack asks for, which throws off text measurement and leaves gaps at the end of lines. The pack's zoom is now restored after every recalculation.
+[*][b]Junimo bundle names.[/b] Bundle names stay English until you save, quit to the menu and reload, because the bundle data is cached in English before your language is applied. They're now localized immediately, without the ritual. Bundle progress and remixed bundles are never touched.
+[*][b]Justified dialogue text.[/b] Optional: spaces are stretched so dialogue has an even right edge, which looks much better in languages with long words.
+[*][b]Localized «(Recipe)» suffix.[/b] For Ukrainian packs only — other languages are unaffected.
+[/list]
+
+[line]
+
+[size=4][b]Requirements[/b][/size]
+
+[list]
+[*][b]SMAPI for Android[/b] — the fork by NRTnarathip ([url=https://github.com/NRTnarathip/SMAPI-Android-1.6]SMAPI-Android-1.6[/url]). This mod does [b]not[/b] work on PC — see «Custom Language Bundle Fix» for the desktop version of the bundle fix.
+[*][b]A language pack[/b] — any custom language mod. Without one this mod has nothing to do.
+[*][b]Generic Mod Config Menu[/b] (optional) — to change settings in-game instead of editing config.json.
+[/list]
+
+[size=4][b]Installation[/b][/size]
+
+[list=1]
+[*]Install the SMAPI Launcher and Stardew Valley 1.6.15.1 or newer.
+[*]Unzip the download into your [b]Mods[/b] folder, next to your language pack.
+[*]Start the game through the SMAPI Launcher. Pick your language from the globe button on the title screen — custom languages are at the bottom of the list.
+[/list]
+
+[size=4][b]Configuration[/b][/size]
+
+Three settings are available in the in-game menu (with Generic Mod Config Menu installed): time format, font zoom fix, and justified dialogue. Everything else is on by default and can be switched off in [b]config.json[/b] if you ever hit a conflict with another mod.
+
+[line]
+
+[size=4][b]Credits[/b][/size]
+
+[list]
+[*][b]Pereclaw[/b] — the Ukrainian translation this was originally built for. The bugs were in the game, not in the pack.
+[*][b]DID[/b] — the original desktop RecipeUkrainizacija, and all the mobile testing.
+[*][b]NRTnarathip[/b] — SMAPI for Android and the Generic Mod Config Menu port.
+[*][b]spacechase0[/b] — Generic Mod Config Menu.
+[/list]
+
+Source code and full technical write-up: [url=https://github.com/ThatHunky/CustomLanguageFixes]github.com/ThatHunky/CustomLanguageFixes[/url]. Licensed MIT — feel free to reuse the code, and translations of the mod's own text are very welcome.
+
+[line]
+
+[size=4][b]Українською[/b][/size]
+
+Мод лагодить усе, що мобільна версія гри ламає для кастомних (мод-) мов — для будь-якого мовного пака, не лише українського. Раніше проєкт називався «Солов'їна Долина».
+
+Що виправлено: годинник на HUD (тепер або 24-годинний, або 12-годинний із дп/пп — раніше кастомні мови взагалі не мали позначки), мод-мови у вбудованому меню вибору мов, пам'ять вибору мови, зум шрифта пака, назви клунків Джунімо одразу без «збережись і перезайди», рівний правий край у діалогах і суфікс «(Рецепт)/(Креслення)» для українських паків.
+
+Потрібні SMAPI для Android (форк NRTnarathip) і будь-який мовний пак. Налаштування — у config.json або в грі через Generic Mod Config Menu.
