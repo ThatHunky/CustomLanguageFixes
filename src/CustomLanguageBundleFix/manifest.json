@@ -1,8 +1,8 @@
 {
   "Name": "Custom Language Bundle Fix",
   "Author": "ThatHunky & DID",
-  "Version": "1.0.1",
-  "Description": "Junimo bundle names show in your custom (mod) language immediately - no more save-and-relog ritual.",
+  "Version": "1.1.0",
+  "Description": "Fixes for custom (mod) languages on PC: Junimo bundle names show immediately, single male farmers get the correct relationship status on the social page, and Ukrainian recipe/blueprint suffixes are localized.",
   "UniqueID": "ThatHunky.CustomLanguageBundleFix",
   "EntryDll": "CustomLanguageBundleFix.dll",
   "MinimumApiVersion": "4.0.0",
