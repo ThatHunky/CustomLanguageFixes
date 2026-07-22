@@ -288,7 +288,7 @@ namespace CustomLanguageFixes
                     return;
 
                 string suffix = Game1.content.LoadString("Strings\\StringsFromCSFiles:Object.cs.12657");
-                if (__result.EndsWith(suffix))
+                if (!string.IsNullOrEmpty(suffix) && __result.EndsWith(suffix))
                 {
                     string ua = (__instance.Category == -7) ? " (\u0420\u0435\u0446\u0435\u043f\u0442)" : " (\u041a\u0440\u0435\u0441\u043b\u0435\u043d\u043d\u044f)";
                     __result = __result.Substring(0, __result.Length - suffix.Length) + ua;
