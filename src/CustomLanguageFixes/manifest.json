@@ -2,7 +2,7 @@
   "Name": "Custom Language Fixes",
   "Author": "ThatHunky & DID",
   "Version": "2.1.0",
-  "Description": "Fixes everything the Android port breaks for custom (mod) languages: language selection menu, 24h clock, font zoom, justified dialogue, and Junimo bundle names.",
+  "Description": "Fixes everything the Android port breaks for custom (mod) languages: language selection menu, remembered language choice, 12/24-hour clock, localized recipe suffix, font zoom, justified dialogue, and Junimo bundle names.",
   "UniqueID": "ThatHunky.CustomLanguageFixes",
   "EntryDll": "CustomLanguageFixes.dll",
   "MinimumApiVersion": "4.0.0",
