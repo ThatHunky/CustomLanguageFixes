@@ -31,9 +31,9 @@ The bundle bug is shared, though: the desktop `NetWorldState` has the same `_bun
 
 ## Installation
 
-**Android:** install the [SMAPI Launcher](https://github.com/NRTnarathip/SMAPI-Android-1.6) and game 1.6.15.1+, unzip `CustomLanguageFixes-2.0.0.zip` from [releases/](releases/) into `StardewValley/Mods/` (next to your language pack), and restart through the launcher. Pick your language from the globe button on the title screen — custom languages are at the bottom of the list.
+**Android:** install the [SMAPI Launcher](https://github.com/NRTnarathip/SMAPI-Android-1.6) and game 1.6.15.1+, unzip `CustomLanguageFixes-2.1.0.zip` from [releases/](releases/) into `StardewValley/Mods/` (next to your language pack), and restart through the launcher. Pick your language from the globe button on the title screen — custom languages are at the bottom of the list.
 
-**PC:** install [SMAPI](https://smapi.io), unzip `CustomLanguageBundleFix-1.0.0.zip` into `Stardew Valley/Mods/`, run the game through SMAPI.
+**PC:** install [SMAPI](https://smapi.io), unzip `CustomLanguageBundleFix-1.0.1.zip` into `Stardew Valley/Mods/`, run the game through SMAPI.
 
 **Optional (Android):** install [Generic Mod Config Menu](https://www.nexusmods.com/stardewvalley/mods/5098) (Android port: NRTnarathip's [StardewValleyMods-Android](https://github.com/NRTnarathip/StardewValleyMods-Android)) to change settings in-game instead of editing `config.json`. The PC mod has no menu — its only setting is an escape hatch nobody needs to touch.
 
@@ -59,15 +59,14 @@ The last four are config-only escape hatches for troubleshooting a mod conflict 
 
 ## Building
 
-**Android** needs the *mobile* assemblies — desktop ones won't do, since the mobile UI code is forked. Extract them from the APK:
+**Android** needs the *mobile* assemblies — desktop ones won't do, since the mobile UI code is forked. Recent APKs (1.6.15.x) are built with .NET-Android, so the assemblies live inside `lib/<arch>/libassemblies.<arch>.blob.so` (an ELF AssemblyStore), *not* the classic Xamarin `assemblies.blob` that `pyxamstore` reads. Extract them with the bundled script:
 
 ```bash
-adb shell pm path com.chucklefish.stardewvalley
-adb pull /data/app/.../base.apk
-unzip base.apk -d apk/ && pyxamstore unpack -d apk/assemblies/
+py -m pip install lz4
+py tools/extract_mobile_assemblies.py path/to/stardew.apk src/CustomLanguageFixes/libs/
 ```
 
-Put `StardewValley.dll`, `StardewValley.GameData.dll`, `StardewModdingAPI.dll` and `SMAPI.Toolkit.CoreInterfaces.dll` into `src/CustomLanguageFixes/libs/` (gitignored — game files are ConcernedApe's copyright), then:
+That writes the mobile `StardewValley.dll` + `StardewValley.GameData.dll` straight into `libs/` (gitignored — game files are ConcernedApe's copyright). Add `StardewModdingAPI.dll` and `SMAPI.Toolkit.CoreInterfaces.dll` (from the SMAPI installer's `install.dat`, see below) to the same folder, then:
 
 ```bash
 cd src/CustomLanguageFixes && dotnet build -c Release
@@ -146,9 +145,9 @@ Card: `4874 1000 3082 2038`
 
 **Статус:** у розробці, на Nexus ще не опубліковано.
 
-**Встановлення (Android):** постав [SMAPI Launcher](https://github.com/NRTnarathip/SMAPI-Android-1.6), розпакуй `CustomLanguageFixes-2.0.0.zip` з [releases/](releases/) у `StardewValley/Mods/` поряд з мовним паком, перезапусти гру через лаунчер. Мова вибирається кнопкою-бульбашкою на титулці — кастомні мови внизу списку.
+**Встановлення (Android):** постав [SMAPI Launcher](https://github.com/NRTnarathip/SMAPI-Android-1.6), розпакуй `CustomLanguageFixes-2.1.0.zip` з [releases/](releases/) у `StardewValley/Mods/` поряд з мовним паком, перезапусти гру через лаунчер. Мова вибирається кнопкою-бульбашкою на титулці — кастомні мови внизу списку.
 
-**Встановлення (ПК):** постав [SMAPI](https://smapi.io), розпакуй `CustomLanguageBundleFix-1.0.0.zip` у `Stardew Valley/Mods/`.
+**Встановлення (ПК):** постав [SMAPI](https://smapi.io), розпакуй `CustomLanguageBundleFix-1.0.1.zip` у `Stardew Valley/Mods/`.
 
 **Налаштування:** кожну фічу можна вимкнути в `config.json` (таблиця вище) або в грі через [Generic Mod Config Menu](https://www.nexusmods.com/stardewvalley/mods/5098) — на Android є порт від NRTnarathip.
 
