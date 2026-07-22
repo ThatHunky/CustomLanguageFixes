@@ -129,13 +129,9 @@ namespace CustomLanguageFixes
                 if (!RowBounds(__instance, i).Contains(x, y))
                     continue;
                 Game1.playSound("select");
-                LocalizedContentManager.SetModLanguage(_langs[i]);
-                var prefs = new StartupPreferences();
-                prefs.loadPreferences(false, true);
-                prefs.savePreferences(false, true);
-                ModEntry.Config.PreferredLanguage = _langs[i].Id;
-                ModEntry.H.WriteConfig(ModEntry.Config);
-                ModEntry.Log.Log(ModEntry.H.Translation.Get("log.language-picked", new { id = _langs[i].Id }), StardewModdingAPI.LogLevel.Info);
+                // спільна логіка з авто-перемиканням: зокрема TranslateFields() для mod→mod,
+                // якого тут раніше бракувало — перемикання між двома мод-паками лишало кеш рядків/шрифтів старим
+                ModEntry.SwitchTo(_langs[i], "log.language-picked");
                 __instance.exitThisMenu();
                 return;
             }

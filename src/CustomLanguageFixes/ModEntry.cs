@@ -129,10 +129,14 @@ namespace CustomLanguageFixes
                 SwitchTo(target);
         }
 
-        private static void SwitchTo(ModLanguage lang)
+        // Спільна логіка перемикання мови — і для авто-застосування на старті, і для тапу в
+        // меню мов (LangMenuPatch). PreferredLanguage виставляємо ДО зміни мови, щоб OnLanguageChanged
+        // побачив його вже актуальним і не переписував config удруге; запис робимо тут один раз.
+        internal static void SwitchTo(ModLanguage lang, string logKey = "log.language-switched")
         {
             try
             {
+                Config.PreferredLanguage = lang?.Id ?? "en";
                 if (lang == null)
                 {
                     LocalizedContentManager.CurrentLanguageCode = LocalizedContentManager.LanguageCode.en; // property => OnLanguageChange => перезавантаження рядків
@@ -152,9 +156,8 @@ namespace CustomLanguageFixes
                 prefs.loadPreferences(false, true);
                 prefs.savePreferences(false, true);
 
-                Config.PreferredLanguage = lang?.Id ?? "en";
                 H.WriteConfig(Config);
-                Log.Log(H.Translation.Get("log.language-switched", new { id = lang?.Id ?? "en" }), LogLevel.Info);
+                Log.Log(H.Translation.Get(logKey, new { id = lang?.Id ?? "en" }), LogLevel.Info);
             }
             catch (Exception ex)
             {
