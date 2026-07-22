@@ -6,5 +6,5 @@
   "UniqueID": "ThatHunky.CustomLanguageFixes",
   "EntryDll": "CustomLanguageFixes.dll",
   "MinimumApiVersion": "4.0.0",
-  "UpdateKeys": ["GitHub:ThatHunky/CustomLanguageFixes"]
+  "UpdateKeys": ["Nexus:49539", "GitHub:ThatHunky/CustomLanguageFixes"]
 }
