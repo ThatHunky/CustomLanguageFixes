@@ -1,6 +1,6 @@
 # Custom Language Fixes
 
-> **Status: the Android mod is [live on Nexus Mods](https://www.nexusmods.com/stardewvalley/mods/49539); the PC mod is in progress.** Previously known as «Солов'їна Долина» (Solovyina Dolyna) — still the Ukrainian name of the project.
+> **Status: both mods are live on Nexus Mods — [Android](https://www.nexusmods.com/stardewvalley/mods/49539) and [PC](https://www.nexusmods.com/stardewvalley/mods/49543).** Previously known as «Солов'їна Долина» (Solovyina Dolyna) — still the Ukrainian name of the project.
 
 Two SMAPI mods that fix what Stardew Valley breaks for **custom (mod) languages** — any language pack, not just Ukrainian. Everything is gated on «a custom language is active», so vanilla languages are never touched.
 
