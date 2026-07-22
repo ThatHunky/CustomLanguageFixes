@@ -1,4 +1,5 @@
 using CustomLanguage.Shared;
+using HarmonyLib;
 using StardewModdingAPI;
 using StardewValley;
 
@@ -6,10 +7,10 @@ namespace CustomLanguageBundleFix
 {
     public class ModConfig
     {
-        // Єдина опція мода — аварійний вимикач у config.json, у GMCM не виводиться:
-        // вимикати сам фікс нема сенсу, а назви, вже локалізовані в поточній сесії,
-        // повернуться англійськими лише після перезавантаження сейва.
+        // Аварійні вимикачі в config.json (GMCM на ПК нема): у нормі чіпати не треба.
         public bool BundleNamesFix { get; set; } = true;
+        public bool SocialSingleFix { get; set; } = true; // «холостий»/«незаміжня» на слоті фермера за статтю
+        public bool RecipeSuffix { get; set; } = true;    // «(Рецепт)»/«(Креслення)», лише для uk
     }
 
     public class ModEntry : Mod
@@ -20,6 +21,9 @@ namespace CustomLanguageBundleFix
         {
             _config = helper.ReadConfig<ModConfig>();
             BundlePatch.Apply(helper, this.Monitor, () => _config.BundleNamesFix);
+            var harmony = new Harmony(this.ModManifest.UniqueID);
+            SocialPatch.Apply(harmony, () => _config.SocialSingleFix); // стать у статусі «самотній» на слоті фермера
+            RecipePatch.Apply(harmony, () => _config.RecipeSuffix);    // «(Рецепт)»/«(Креслення)» для укр. мод-мови
             // зміна мови посеред сесії (на ПК меню мов саме фаєрить OnLanguageChange)
             LocalizedContentManager.OnLanguageChange += _ =>
             {

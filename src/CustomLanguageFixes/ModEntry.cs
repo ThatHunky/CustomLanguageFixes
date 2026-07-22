@@ -11,7 +11,6 @@ using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.GameData;
 using StardewValley.Menus;
-using SObject = StardewValley.Object;
 
 namespace CustomLanguageFixes
 {
@@ -30,6 +29,7 @@ namespace CustomLanguageFixes
         // тільки після перезавантаження сейва.
         public bool LanguageMenu { get; set; } = true;
         public bool BundleNamesFix { get; set; } = true;
+        public bool SocialSingleFix { get; set; } = true; // «холостий»/«незаміжня» на слоті фермера за статтю
     }
 
     public class ModEntry : Mod
@@ -46,10 +46,11 @@ namespace CustomLanguageFixes
 
             var harmony = new Harmony("ThatHunky.CustomLanguageFixes");
             ClockPatch.Apply(harmony);   // 24h HUD-годинник для мод-мов
-            RecipePatch.Apply(harmony);  // (Рецепт)/(Креслення) — тільки для укр. мод-мови
+            RecipePatch.Apply(harmony, () => Config.RecipeSuffix);  // (Рецепт)/(Креслення) — тільки для укр. мод-мови
             LangMenuPatch.Apply(harmony); // мод-мови у вбудованому меню вибору мов
             FontPatch.Apply(harmony);     // зум шрифта пака не затирається shrinkFont'ом
             JustifyPatch.Apply(harmony);  // рівний правий край тексту діалогів (justify)
+            SocialPatch.Apply(harmony, () => Config.SocialSingleFix);   // стать у статусі «самотній» на слоті фермера (Social page)
             BundlePatch.Apply(helper, this.Monitor, () => Config.BundleNamesFix); // локалізовані назви клунків одразу
 
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;     // меню налаштувань (GMCM), якщо є
@@ -259,42 +260,6 @@ namespace CustomLanguageFixes
                 return false;
             }
             return true;
-        }
-    }
-
-    // --- Рецепти: логіка DID.RecipeUkrainizacija, тільки для укр. мод-мови ---
-    internal static class RecipePatch
-    {
-        public static void Apply(Harmony harmony)
-        {
-            harmony.Patch(
-                original: AccessTools.PropertyGetter(typeof(SObject), nameof(SObject.DisplayName)),
-                postfix: new HarmonyMethod(typeof(RecipePatch), nameof(Postfix))
-            );
-        }
-
-        public static void Postfix(SObject __instance, ref string __result)
-        {
-            try
-            {
-                if (!ModEntry.Config.RecipeSuffix)
-                    return;
-                if (LocalizedContentManager.CurrentLanguageCode != LocalizedContentManager.LanguageCode.mod)
-                    return;
-                // суфікси українські — не чіпаємо інші мод-мови (тайську і т.д.)
-                if (!string.Equals(LocalizedContentManager.CurrentModLanguage?.LanguageCode, "uk", StringComparison.OrdinalIgnoreCase))
-                    return;
-                if (__instance.isRecipe == null || !__instance.isRecipe.Value)
-                    return;
-
-                string suffix = Game1.content.LoadString("Strings\\StringsFromCSFiles:Object.cs.12657");
-                if (!string.IsNullOrEmpty(suffix) && __result.EndsWith(suffix))
-                {
-                    string ua = (__instance.Category == -7) ? " (\u0420\u0435\u0446\u0435\u043f\u0442)" : " (\u041a\u0440\u0435\u0441\u043b\u0435\u043d\u043d\u044f)";
-                    __result = __result.Substring(0, __result.Length - suffix.Length) + ua;
-                }
-            }
-            catch { }
         }
     }
 }
