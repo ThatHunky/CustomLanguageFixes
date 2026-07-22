@@ -6,5 +6,5 @@
   "UniqueID": "ThatHunky.CustomLanguageBundleFix",
   "EntryDll": "CustomLanguageBundleFix.dll",
   "MinimumApiVersion": "4.0.0",
-  "UpdateKeys": []
+  "UpdateKeys": ["Nexus:49543"]
 }
