@@ -14,6 +14,7 @@ It works with [b]any[/b] language pack, not a specific one. Every patch is gated
 [*][b]Language memory.[/b] Your choice is remembered and respected on startup — including a deliberate switch back to a built-in language.
 [*][b]Font zoom.[/b] The mobile font code overwrites the zoom your pack asks for, which throws off text measurement and leaves gaps at the end of lines. The pack's zoom is now restored after every recalculation.
 [*][b]Junimo bundle names.[/b] Bundle names stay English until you save, quit to the menu and reload, because the bundle data is cached in English before your language is applied. They're now localized immediately, without the ritual. Bundle progress and remixed bundles are never touched.
+[*][b]Social page: single male farmers.[/b] In gendered languages the social page showed single male farmers (your own character, co-op farmhands) with the feminine single status — a first-party game bug where the farmer slot only ever reads the female status key. Each farmer now shows the correct gendered status.
 [*][b]Justified dialogue text.[/b] Optional: spaces are stretched so dialogue has an even right edge, which looks much better in languages with long words.
 [*][b]Localized «(Recipe)» suffix.[/b] For Ukrainian packs only — other languages are unaffected.
 [/list]
@@ -59,6 +60,6 @@ Source code and full technical write-up: [url=https://github.com/ThatHunky/Custo
 
 Мод лагодить усе, що мобільна версія гри ламає для кастомних (мод-) мов — для будь-якого мовного пака, не лише українського. Раніше проєкт називався «Солов'їна Долина».
 
-Що виправлено: годинник на HUD (тепер або 24-годинний, або 12-годинний із дп/пп — раніше кастомні мови взагалі не мали позначки), мод-мови у вбудованому меню вибору мов, пам'ять вибору мови, зум шрифта пака, назви клунків Джунімо одразу без «збережись і перезайди», рівний правий край у діалогах і суфікс «(Рецепт)/(Креслення)» для українських паків.
+Що виправлено: годинник на HUD (тепер або 24-годинний, або 12-годинний із дп/пп — раніше кастомні мови взагалі не мали позначки), мод-мови у вбудованому меню вибору мов, пам'ять вибору мови, зум шрифта пака, назви клунків Джунімо одразу без «збережись і перезайди», правильний за статтю статус «самотній» на слоті фермера, рівний правий край у діалогах і суфікс «(Рецепт)/(Креслення)» для українських паків.
 
 Потрібні SMAPI для Android (форк NRTnarathip) і будь-який мовний пак. Налаштування — у config.json або в грі через Generic Mod Config Menu.

@@ -1,18 +1,16 @@
-[size=4][b]Junimo bundle names in your language, immediately — no save-and-reload ritual.[/b][/size]
+[size=4][b]The things Stardew Valley breaks for custom (mod) languages on PC — fixed.[/b][/size]
 
-If you play with a community translation (a custom «mod» language), the Community Center bundle names stay in English until you save the game, quit to the title screen and load again. After that they're translated — until the next time it happens.
-
-This mod fixes that. Bundle names are localized as soon as the save loads.
+If you play with a community translation (a custom «mod» language), a few things quietly break on the desktop game. This mod fixes all three. It works with [b]any[/b] language pack; with a built-in game language it does nothing at all.
 
 [line]
 
-[size=4][b]Why it happens[/b][/size]
+[size=4][b]What it fixes[/b][/size]
 
-The game caches [b]Data/Bundles[/b] in English before your custom language is applied, and the display-name cache inside the world state is only rebuilt once per session. So the English names get baked in and stay there for as long as you're playing.
-
-The mod clears the cached asset resolution, invalidates the bundle data, and marks the name cache dirty so the game re-reads the localized asset it should have used in the first place. It also watches for translations that a language pack enables partway through a session — some packs only switch their bundle translation on once a save has bundle data, and the mod picks that up as soon as it happens.
-
-[b]Your bundle progress is never touched.[/b] The mod only refreshes display names; it never writes bundle data back, so remixed bundles and completion state are safe.
+[list]
+[*][b]Junimo bundle names — immediately.[/b] Community Center bundle names stay English until you save, quit to the title screen and reload, because the game caches Data/Bundles in English before your language is applied. They're now localized as soon as the save loads. [b]Your bundle progress is never touched[/b] — only display names are refreshed, so remixed bundles and completion are safe.
+[*][b]Social page: single male farmers.[/b] In gendered languages the social page showed single [b]male[/b] farmers (your own character, co-op farmhands) with the [b]feminine[/b] single status. It's a first-party game bug — the farmer slot only ever reads the female status key and splits it, so a pack with separate male/female strings gets the female form for men. Each farmer now shows the correct gendered status.
+[*][b]Localized «(Recipe)» suffix.[/b] For Ukrainian packs only: the game uses one «(Recipe)» key for both cooking recipes and crafting blueprints, which Ukrainian has to tell apart. Food gets «(Рецепт)», everything else «(Креслення)». Other languages are unaffected.
+[/list]
 
 [line]
 
@@ -25,13 +23,13 @@ The mod clears the cached asset resolution, invalidates the bundle data, and mar
 
 [size=4][b]Installation[/b][/size]
 
-Unzip into your [b]Mods[/b] folder and run the game through SMAPI. There is nothing to configure.
+Unzip into your [b]Mods[/b] folder and run the game through SMAPI. Everything is on by default; the three toggles live in [b]config.json[/b] if you ever hit a conflict with another mod.
 
-[i]On Android?[/i] Use «Custom Language Fixes» instead — it includes this fix plus everything else the mobile port breaks for custom languages.
+[i]On Android?[/i] Use «Custom Language Fixes» instead — it includes these fixes plus everything else the mobile port breaks for custom languages.
 
 [line]
 
-Source code: [url=https://github.com/ThatHunky/CustomLanguageFixes]github.com/ThatHunky/CustomLanguageFixes[/url]. Licensed MIT.
+Source code and full technical write-up: [url=https://github.com/ThatHunky/CustomLanguageFixes]github.com/ThatHunky/CustomLanguageFixes[/url]. Licensed MIT.
 
 Credits: [b]Pereclaw[/b] for the Ukrainian translation this was diagnosed against, and [b]DID[/b] for testing.
 
@@ -39,8 +37,11 @@ Credits: [b]Pereclaw[/b] for the Ukrainian translation this was diagnosed agains
 
 [size=4][b]Українською[/b][/size]
 
-Назви клунків Джунімо українською (чи будь-якою іншою мод-мовою) одразу після завантаження сейва — без ритуалу «збережись, вийди в меню, зайди знову».
+Три речі, які гра ламає для кастомних (мод-) мов на ПК — виправлено:
+[list]
+[*]назви клунків Джунімо одразу після завантаження сейва, без ритуалу «збережись, вийди в меню, зайди знову» (прогрес клунків не зачіпається);
+[*]правильний за статтю статус «самотній» на слоті фермера — чоловічі фермери більше не показують «незаміжня» (ванільний баг гри);
+[*]суфікс «(Рецепт)»/«(Креслення)» для українських паків — гра не розрізняє їжу від креслень, а мод розрізняє.
+[/list]
 
-Гра кешує Data/Bundles англійською ще до застосування мод-мови, а кеш назв перебудовує лише раз за сесію. Мод скидає ці кеші й змушує гру перечитати локалізований асет. Прогрес клунків не зачіпається — мод змінює тільки відображувані назви.
-
-Потрібні SMAPI 4.0+ і будь-який мовний пак. Налаштовувати нічого не треба.
+Потрібні SMAPI 4.0+ і будь-який мовний пак. Усе ввімкнено за замовчуванням; вимикачі — у config.json.
