@@ -6,8 +6,8 @@ Two SMAPI mods that fix what Stardew Valley breaks for **custom (mod) languages*
 
 | Mod | Platform | What it's for |
 |---|---|---|
-| **Custom Language Fixes (Android)** | Android (SMAPI [fork by NRTnarathip](https://github.com/NRTnarathip/SMAPI-Android-1.6)) | The mobile port forks a lot of UI code and forgets the `mod` language branch — seven separate breakages |
-| **Custom Language Bundle Fix** | PC (Windows/Linux/macOS) | On PC only one thing breaks: Junimo bundle names stay English |
+| **Custom Language Fixes (Android)** | Android (SMAPI [fork by NRTnarathip](https://github.com/NRTnarathip/SMAPI-Android-1.6)) | The mobile port forks a lot of UI code and forgets the `mod` language branch — eight fixes (five mobile-only, three shared with PC) |
+| **Custom Language Bundle Fix** | PC (Windows/Linux/macOS) | The three cross-platform fixes: Junimo bundle names, the social-page single status, and the «(Recipe)» suffix |
 
 Tested on Stardew Valley **1.6.15.3** (Android build 245, SMAPI 4.3.2) and **1.6.15** (PC).
 
@@ -21,19 +21,18 @@ Tested on Stardew Valley **1.6.15.3** (Android build 245, SMAPI 4.3.2) and **1.6
 | **Localized «(Recipe)» suffix** | The `(Recipe)` suffix on item names was left untranslated | Postfix on `Object.DisplayName`: food (category −7) gets «(Рецепт)», everything else «(Креслення)». Only runs for packs with language code `uk` — other languages are unaffected. Ported from DID's desktop mod RecipeUkrainizacija |
 | **Font zoom** | Mobile `SpriteText.SetFontPixelZoom()` has no `mod` branch and overwrites the pack's zoom (3.3 → 3) | Postfix restores the pack's `FontPixelZoom` after every recalculation |
 | **Justified dialogue** | Greedy word wrap leaves a ragged right edge, which is very visible with long words | Custom renderer on top of the vanilla one: spaces stretch to even out the edge (max 1.5× space width), the last line of a paragraph is left alone, typewriter effect and response options behave as usual, and any exception falls back to vanilla silently |
+| **Social page: single farmers** | Single **male** farmers (your own character, co-op farmhands) show the **feminine** single status in gendered languages: `SocialPage.drawFarmerSlot` only reads `..._Single_Female` and splits it on `/`, so a pack with separate `_Male`/`_Female` strings gets the female form for men. A first-party bug ([forum report](https://forums.stardewvalley.net/threads/53790/)), identical on mobile and desktop | While the farmer slot draws, substitute `LoadString(…Single_Female)` with the pack's gender-correct string (`_Male` for men). It has no `/`, so the game's split is a no-op — works for any custom language, on both platforms |
 | **Junimo bundle names** | Bundles stay English until you save and reload: `Data/Bundles` is cached in English before the custom language is applied, and `NetWorldState`'s name cache is rebuilt only once per session | On `SaveLoaded` (and whenever the language changes mid-session) the mod clears the static localized-asset resolver, invalidates `Data/Bundles` + `Strings/BundleNames`, and marks the name cache dirty so `UpdateBundleDisplayNames()` re-reads the localized asset. It also listens for mid-session asset invalidations, because a pack may enable its bundle translation based on save state. Bundle progress and remixed bundles are never touched — `SetBundleData` is never called |
 
 ## Custom Language Bundle Fix (PC)
 
-One feature: the Junimo bundle name fix described above. The rest of the Android list is mobile-only — the desktop game already handles custom languages correctly in its menus, clock, and font handling.
-
-The bundle bug is shared, though: the desktop `NetWorldState` has the same `_bundleDataDirty` / `UpdateBundleDisplayNames()` internals, so both mods compile the same `src/Shared/BundlePatch.cs`.
+Three of the fixes above are shared game bugs — **bundle names**, the **social-page single status**, and the **«(Recipe)» suffix** — so the PC mod compiles them from `src/Shared/` (`BundlePatch`, `SocialPatch`, `RecipePatch`). The rest of the Android list is mobile-only: the desktop game handles custom languages correctly in its menus, clock, and font handling.
 
 ## Installation
 
-**Android:** install the [SMAPI Launcher](https://github.com/NRTnarathip/SMAPI-Android-1.6) and game 1.6.15.1+, unzip `CustomLanguageFixes-2.1.0.zip` from [releases/](releases/) into `StardewValley/Mods/` (next to your language pack), and restart through the launcher. Pick your language from the globe button on the title screen — custom languages are at the bottom of the list.
+**Android:** install the [SMAPI Launcher](https://github.com/NRTnarathip/SMAPI-Android-1.6) and game 1.6.15.1+, unzip `CustomLanguageFixes-2.2.0.zip` from [releases/](releases/) into `StardewValley/Mods/` (next to your language pack), and restart through the launcher. Pick your language from the globe button on the title screen — custom languages are at the bottom of the list.
 
-**PC:** install [SMAPI](https://smapi.io), unzip `CustomLanguageBundleFix-1.0.1.zip` into `Stardew Valley/Mods/`, run the game through SMAPI.
+**PC:** install [SMAPI](https://smapi.io), unzip `CustomLanguageBundleFix-1.1.0.zip` into `Stardew Valley/Mods/`, run the game through SMAPI.
 
 **Optional (Android):** install [Generic Mod Config Menu](https://www.nexusmods.com/stardewvalley/mods/5098) (Android port: NRTnarathip's [StardewValleyMods-Android](https://github.com/NRTnarathip/StardewValleyMods-Android)) to change settings in-game instead of editing `config.json`. The PC mod has no menu — its only setting is an escape hatch nobody needs to touch.
 
@@ -52,10 +51,11 @@ Every feature can be switched off. Edit `config.json` in the mod folder, or use 
 | `RecipeSuffix` | `true` | no | Localized `(Recipe)` suffix (only active for `uk` packs) |
 | `LanguageMenu` | `true` | no | Show custom languages in the built-in language menu |
 | `BundleNamesFix` | `true` | no | Junimo bundle name fix |
+| `SocialSingleFix` | `true` | no | Correct single-status gender on the social page |
 
-The last four are config-only escape hatches for troubleshooting a mod conflict — there's no reason to turn them off in normal play. Two of them wouldn't fully take effect mid-session anyway: the language menu re-reads its setting the next time it opens, and already-localized bundle names only revert after a save reload.
+The last five are config-only escape hatches for troubleshooting a mod conflict — there's no reason to turn them off in normal play. Two of them wouldn't fully take effect mid-session anyway: the language menu re-reads its setting the next time it opens, and already-localized bundle names only revert after a save reload.
 
-**Custom Language Bundle Fix (PC):** a single `BundleNamesFix` setting in `config.json`, `true` by default. No in-game menu — there is nothing worth switching off.
+**Custom Language Bundle Fix (PC):** `config.json` only, no in-game menu — `BundleNamesFix`, `SocialSingleFix`, and `RecipeSuffix`, all `true` by default (same meanings as the Android table above).
 
 ## Building
 
@@ -85,9 +85,9 @@ Package releases with `python -X utf8 tools/pack_releases.py` — **never** with
 ## Repository structure
 
 ```
-src/Shared/                    — code shared by both mods (BundlePatch, GMCM API interface)
-src/CustomLanguageFixes/       — Android mod (ModEntry + Clock, LangMenu, Recipe, Font, Justify patches)
-src/CustomLanguageBundleFix/   — PC mod (bundle fix only)
+src/Shared/                    — code shared by both mods (Bundle, Social, Recipe patches + GMCM API interface)
+src/CustomLanguageFixes/       — Android mod (ModEntry + Clock, LangMenu, Font, Justify + the shared patches)
+src/CustomLanguageBundleFix/   — PC mod (shared Bundle/Social/Recipe patches)
 legacy/Mobile24hClockFix/      — the original standalone clock fix, superseded by ClockPatch,
                                  kept as history and as a minimal example
 releases/                      — built zips
@@ -103,6 +103,7 @@ tools/stardew-font-editor.html  — in-browser editor for the game's .fnt fonts;
 
 ## Version history
 
+- **2.2.0** (Android) / **1.1.0** (PC) — social-page single-status fix: single male farmers no longer show the feminine status (a first-party bug, [forum report](https://forums.stardewvalley.net/threads/53790/)). Both the social fix and the «(Recipe)» suffix move to shared code, so the PC mod now does three things (bundles, social, recipe), not one
 - **2.1.0** — the 12-hour clock option now actually works: custom languages used to get 12-hour numbers with no am/pm at all, so the mod now swaps to the English branch and substitutes the pack's own am/pm strings. GMCM menu down to three settings with localized dropdown values; «(Recipe)» suffix is config-only now, since it's part of the translation rather than a preference. Mod renamed from «Custom Language Fixes (Android)» to «Custom Language Fixes»
 - **2.0.1** — GMCM menu trimmed to the four settings worth changing (`Clock` renamed to «Time format»); the language-menu and bundle-fix switches stay in `config.json` only. PC mod (1.0.1) drops its GMCM menu entirely
 - **2.0.0** — universal release: renamed from Солов'їна Долина, English-first with i18n (`default.json` + `uk.json`), per-feature config switches, in-game GMCM menu, and a separate PC mod sharing the bundle fix
@@ -140,14 +141,14 @@ Card: `4874 1000 3082 2038`
 
 **Два SMAPI-моди, які лагодять те, що гра ламає для кастомних (мод-) мов** — для будь-якого мовного пака, не лише українського. Раніше проєкт називався «Солов'їна Долина»; українська назва лишається.
 
-- **Custom Language Fixes (Android)** — сім фіксів мобільного порту: 24-годинний годинник на HUD, мод-мови у вбудованому меню вибору мов, пам'ять вибору мови, суфікс «(Рецепт)/(Креслення)», зум шрифта пака, рівний правий край у діалогах і локалізовані назви клунків Джунімо.
-- **Custom Language Bundle Fix (ПК)** — лише назви клунків: на десктопі решта працює з коробки.
+- **Custom Language Fixes (Android)** — вісім фіксів: 24-годинний годинник на HUD, мод-мови у вбудованому меню вибору мов, пам'ять вибору мови, зум шрифта пака, рівний правий край у діалогах (суто мобільні), а також спільні з ПК — назви клунків Джунімо, статус «самотній» за статтю на слоті фермера і суфікс «(Рецепт)/(Креслення)».
+- **Custom Language Bundle Fix (ПК)** — три спільні фікси: назви клунків, статус «самотній» на слоті фермера і суфікс рецептів. Решта з Android-списку — суто мобільна.
 
 **Статус:** у розробці, на Nexus ще не опубліковано.
 
-**Встановлення (Android):** постав [SMAPI Launcher](https://github.com/NRTnarathip/SMAPI-Android-1.6), розпакуй `CustomLanguageFixes-2.1.0.zip` з [releases/](releases/) у `StardewValley/Mods/` поряд з мовним паком, перезапусти гру через лаунчер. Мова вибирається кнопкою-бульбашкою на титулці — кастомні мови внизу списку.
+**Встановлення (Android):** постав [SMAPI Launcher](https://github.com/NRTnarathip/SMAPI-Android-1.6), розпакуй `CustomLanguageFixes-2.2.0.zip` з [releases/](releases/) у `StardewValley/Mods/` поряд з мовним паком, перезапусти гру через лаунчер. Мова вибирається кнопкою-бульбашкою на титулці — кастомні мови внизу списку.
 
-**Встановлення (ПК):** постав [SMAPI](https://smapi.io), розпакуй `CustomLanguageBundleFix-1.0.1.zip` у `Stardew Valley/Mods/`.
+**Встановлення (ПК):** постав [SMAPI](https://smapi.io), розпакуй `CustomLanguageBundleFix-1.1.0.zip` у `Stardew Valley/Mods/`.
 
 **Налаштування:** кожну фічу можна вимкнути в `config.json` (таблиця вище) або в грі через [Generic Mod Config Menu](https://www.nexusmods.com/stardewvalley/mods/5098) — на Android є порт від NRTnarathip.
 

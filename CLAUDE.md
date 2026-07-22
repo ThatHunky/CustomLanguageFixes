@@ -25,22 +25,22 @@ python -X utf8 tools/pack_releases.py
 
 ## Architecture
 
-**One shared source file, two mods.** `src/Shared/*.cs` is not a shared DLL — each `.csproj` pulls it in with `<Compile Include="..\Shared\**\*.cs" LinkBase="Shared" />`, so the same source compiles into both assemblies against different game DLLs. `BundlePatch.cs` (the Junimo bundle fix) and `IGenericModConfigMenuApi.cs` (a minimal hand-copied GMCM interface — the standard no-dependency SMAPI integration) live there.
+**One shared source file, two mods.** `src/Shared/*.cs` is not a shared DLL — each `.csproj` pulls it in with `<Compile Include="..\Shared\**\*.cs" LinkBase="Shared" />`, so the same source compiles into both assemblies against different game DLLs. `BundlePatch.cs` (bundle names), `SocialPatch.cs` (social-page single status), `RecipePatch.cs` (the `uk` recipe suffix), and `IGenericModConfigMenuApi.cs` (a minimal hand-copied GMCM interface — the standard no-dependency SMAPI integration) live there.
 
 **The one invariant that makes everything safe:** every patch and behavior is gated on `LocalizedContentManager.CurrentLanguageCode == LocalizedContentManager.LanguageCode.mod`. Vanilla languages fall through to unmodified game code. When adding any patch, this gate is mandatory — it is the reason the mod can touch forked UnityUI code without risk to normal players. (`FontPatch` documents a subtlety: `CurrentModLanguage` can stay non-null after switching *away* from a mod language, so gate on the *code*, not on that field.)
 
-**Why two mods / the Android-vs-PC asymmetry.** The mobile port forks a lot of UI code and forgets the `mod` branch, producing seven breakages; the desktop game handles custom languages correctly *except* for one shared bug (bundle names). So:
-- **`src/CustomLanguageFixes/` (Android)** = five Harmony patch classes + the shared bundle fix.
-- **`src/CustomLanguageBundleFix/` (PC)** = the shared bundle fix only.
+**Why two mods / the Android-vs-PC asymmetry.** The mobile port forks a lot of UI code and forgets the `mod` branch; the desktop game handles custom languages correctly *except* for three shared game bugs (bundle names, the social-page single status, the recipe suffix). So:
+- **`src/CustomLanguageFixes/` (Android)** = four mobile-only patch classes (`ClockPatch`, `LangMenuPatch`, `FontPatch`, `JustifyPatch`) + the three shared patches.
+- **`src/CustomLanguageBundleFix/` (PC)** = the three shared patches only (`BundlePatch`, `SocialPatch`, `RecipePatch`).
 
 **`ModEntry.Entry` is the wiring hub** (Android version). It reads config, applies each patch's `Apply(harmony)`, and subscribes three SMAPI events that carry the cross-cutting language logic:
 - `GameLaunched` → register the GMCM menu if that mod is present.
 - `Content.AssetReady` (on `Data/AdditionalLanguages`) → apply the player's saved `PreferredLanguage` on startup, respecting a deliberate vanilla choice.
 - `LocalizedContentManager.OnLanguageChange` → remember the player's menu pick into `config.json` + game prefs, and re-localize bundles mid-session.
 
-The patch classes are all defined in the Android project: `ClockPatch` + `RecipePatch` (in `ModEntry.cs`), `LangMenuPatch`, `FontPatch`, `JustifyPatch` (own files), and the shared `BundlePatch`. Each is a `static class` with an `Apply(Harmony)` method — follow that shape for new patches.
+Mobile-only patches live in the Android project: `ClockPatch` (in `ModEntry.cs`), `LangMenuPatch`, `FontPatch`, `JustifyPatch` (own files). Cross-platform patches live in `src/Shared/`: `BundlePatch`, `SocialPatch`, `RecipePatch`. Each is a `static class` with an `Apply(...)` method — the shared ones take a `Func<bool>` "enabled" toggle so each mod passes its own config field. Follow that shape for new patches. (The PC mod, unlike Android, creates its own `Harmony` instance in `ModEntry.Entry` for `SocialPatch`/`RecipePatch`; `BundlePatch` is event-based and needs none.)
 
-**Config model split.** `ModConfig` (Android) has two tiers, and this split is intentional: `Clock`, `FontZoomFix`, `JustifyDialogue` are shown in GMCM; `PreferredLanguage`, `RecipeSuffix`, `LanguageMenu`, `BundleNamesFix` are **`config.json`-only escape hatches** for troubleshooting mod conflicts (some don't fully take effect mid-session anyway — see the comments in `ModConfig`). Don't add config-only switches to the GMCM registration in `OnGameLaunched` without a reason.
+**Config model split.** `ModConfig` (Android) has two tiers, and this split is intentional: `Clock`, `FontZoomFix`, `JustifyDialogue` are shown in GMCM; `PreferredLanguage`, `RecipeSuffix`, `LanguageMenu`, `BundleNamesFix`, `SocialSingleFix` are **`config.json`-only escape hatches** for troubleshooting mod conflicts (some don't fully take effect mid-session anyway — see the comments in `ModConfig`). Don't add config-only switches to the GMCM registration in `OnGameLaunched` without a reason. The PC `ModConfig` carries the three shared toggles (`BundleNamesFix`, `SocialSingleFix`, `RecipeSuffix`), all config-only.
 
 **All user-facing strings go through i18n.** GMCM labels/tooltips and every log message are `H.Translation.Get(...)` keys defined in `i18n/default.json` (English) and `i18n/uk.json`. Never hardcode a display or log string.
 
