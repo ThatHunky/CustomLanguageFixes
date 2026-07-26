@@ -22,7 +22,7 @@ Tested on Stardew Valley **1.6.15.3** (Android build 245, SMAPI 4.3.2) and **1.6
 | **Font zoom** | Mobile `SpriteText.SetFontPixelZoom()` has no `mod` branch and overwrites the pack's zoom (3.3 → 3) | Postfix restores the pack's `FontPixelZoom` after every recalculation |
 | **Justified dialogue** | Greedy word wrap leaves a ragged right edge, which is very visible with long words | Custom renderer on top of the vanilla one: spaces stretch to even out the edge (max 1.5× space width), the last line of a paragraph is left alone, typewriter effect and response options behave as usual, and any exception falls back to vanilla silently |
 | **Social page: single farmers** | Single **male** farmers (your own character, co-op farmhands) show the **feminine** single status in gendered languages: `SocialPage.drawFarmerSlot` only reads `..._Single_Female` and splits it on `/`, so a pack with separate `_Male`/`_Female` strings gets the female form for men. A first-party bug ([forum report](https://forums.stardewvalley.net/threads/53790/)), identical on mobile and desktop | While the farmer slot draws, substitute `LoadString(…Single_Female)` with the pack's gender-correct string (`_Male` for men). It has no `/`, so the game's split is a no-op — works for any custom language, on both platforms |
-| **Junimo bundle names** | Bundles stay English until you save and reload: `Data/Bundles` is cached in English before the custom language is applied, and `NetWorldState`'s name cache is rebuilt only once per session | On `SaveLoaded` (and whenever the language changes mid-session) the mod clears the static localized-asset resolver, invalidates `Data/Bundles` + `Strings/BundleNames`, and marks the name cache dirty so `UpdateBundleDisplayNames()` re-reads the localized asset. It also listens for mid-session asset invalidations, because a pack may enable its bundle translation based on save state. Bundle progress and remixed bundles are never touched — `SetBundleData` is never called |
+| **Junimo bundle names** | Bundles stay English until you save and reload: `Data/Bundles` is cached in English before the custom language is applied, and `NetWorldState`'s name cache is rebuilt only once per session | On `SaveLoaded` (and whenever the language changes mid-session) the mod clears the static localized-asset resolver, invalidates `Data/Bundles` + `Strings/BundleNames`, and marks the name cache dirty so `UpdateBundleDisplayNames()` re-reads the localized asset. It also listens for mid-session asset invalidations, because a pack may enable its bundle translation based on save state, and re-checks `Data/Bundles` when you walk into the Community Center, so a pack doesn't have to set `"Update": "OnLocationChange"` on that asset itself. Bundle progress and remixed bundles are never touched — `SetBundleData` is never called |
 
 ## Custom Language Bundle Fix (PC)
 
@@ -30,9 +30,9 @@ Three of the fixes above are shared game bugs — **bundle names**, the **social
 
 ## Installation
 
-**Android:** install the [SMAPI Launcher](https://github.com/NRTnarathip/SMAPI-Android-1.6) and game 1.6.15.1+, unzip `CustomLanguageFixes-2.2.0.zip` from [releases/](releases/) into `StardewValley/Mods/` (next to your language pack), and restart through the launcher. Pick your language from the globe button on the title screen — custom languages are at the bottom of the list.
+**Android:** install the [SMAPI Launcher](https://github.com/NRTnarathip/SMAPI-Android-1.6) and game 1.6.15.1+, unzip `CustomLanguageFixes-2.2.1.zip` from [releases/](releases/) into `StardewValley/Mods/` (next to your language pack), and restart through the launcher. Pick your language from the globe button on the title screen — custom languages are at the bottom of the list.
 
-**PC:** install [SMAPI](https://smapi.io), unzip `CustomLanguageBundleFix-1.1.0.zip` into `Stardew Valley/Mods/`, run the game through SMAPI.
+**PC:** install [SMAPI](https://smapi.io), unzip `CustomLanguageBundleFix-1.1.1.zip` into `Stardew Valley/Mods/`, run the game through SMAPI.
 
 **Optional (Android):** install [Generic Mod Config Menu](https://www.nexusmods.com/stardewvalley/mods/5098) (Android port: NRTnarathip's [StardewValleyMods-Android](https://github.com/NRTnarathip/StardewValleyMods-Android)) to change settings in-game instead of editing `config.json`. The PC mod has no menu — its only setting is an escape hatch nobody needs to touch.
 
@@ -103,6 +103,7 @@ tools/stardew-font-editor.html  — in-browser editor for the game's .fnt fonts;
 
 ## Version history
 
+- **2.2.1** (Android) / **1.1.1** (PC) — bundles round 4: walking into the Community Center re-checks `Data/Bundles`, so a pack that gates its bundle translation on save state no longer has to add `"Update": "OnLocationChange"` to that patch itself — with the plain default update rate the names used to stay English until the next morning. Verified against the game code: nothing in vanilla re-reads localized bundle names mid-session (`_bundleDataDirty` is set only by `SetBundleData` — new game and save load — and by `netBundleData` sync events), and SMAPI's asset propagator has no `Data/Bundles` case, so the pack-side patch alone only takes effect on the next save load
 - **2.2.0** (Android) / **1.1.0** (PC) — social-page single-status fix: single male farmers no longer show the feminine status (a first-party bug, [forum report](https://forums.stardewvalley.net/threads/53790/)). Both the social fix and the «(Recipe)» suffix move to shared code, so the PC mod now does three things (bundles, social, recipe), not one
 - **2.1.0** — the 12-hour clock option now actually works: custom languages used to get 12-hour numbers with no am/pm at all, so the mod now swaps to the English branch and substitutes the pack's own am/pm strings. GMCM menu down to three settings with localized dropdown values; «(Recipe)» suffix is config-only now, since it's part of the translation rather than a preference. Mod renamed from «Custom Language Fixes (Android)» to «Custom Language Fixes»
 - **2.0.1** — GMCM menu trimmed to the four settings worth changing (`Clock` renamed to «Time format»); the language-menu and bundle-fix switches stay in `config.json` only. PC mod (1.0.1) drops its GMCM menu entirely
@@ -144,14 +145,14 @@ Card: `4874 1000 3082 2038`
 - **Custom Language Fixes (Android)** — вісім фіксів: 24-годинний годинник на HUD, мод-мови у вбудованому меню вибору мов, пам'ять вибору мови, зум шрифта пака, рівний правий край у діалогах (суто мобільні), а також спільні з ПК — назви клунків Джунімо, статус «самотній» за статтю на слоті фермера і суфікс «(Рецепт)/(Креслення)».
 - **Custom Language Bundle Fix (ПК)** — три спільні фікси: назви клунків, статус «самотній» на слоті фермера і суфікс рецептів. Решта з Android-списку — суто мобільна.
 
-**Статус:** у розробці, на Nexus ще не опубліковано.
+**Статус:** обидва моди опубліковано на Nexus Mods — [Android](https://www.nexusmods.com/stardewvalley/mods/49539) і [ПК](https://www.nexusmods.com/stardewvalley/mods/49543).
 
-**Встановлення (Android):** постав [SMAPI Launcher](https://github.com/NRTnarathip/SMAPI-Android-1.6), розпакуй `CustomLanguageFixes-2.2.0.zip` з [releases/](releases/) у `StardewValley/Mods/` поряд з мовним паком, перезапусти гру через лаунчер. Мова вибирається кнопкою-бульбашкою на титулці — кастомні мови внизу списку.
+**Встановлення (Android):** постав [SMAPI Launcher](https://github.com/NRTnarathip/SMAPI-Android-1.6), розпакуй `CustomLanguageFixes-2.2.1.zip` з [releases/](releases/) у `StardewValley/Mods/` поряд з мовним паком, перезапусти гру через лаунчер. Мова вибирається кнопкою-бульбашкою на титулці — кастомні мови внизу списку.
 
-**Встановлення (ПК):** постав [SMAPI](https://smapi.io), розпакуй `CustomLanguageBundleFix-1.1.0.zip` у `Stardew Valley/Mods/`.
+**Встановлення (ПК):** постав [SMAPI](https://smapi.io), розпакуй `CustomLanguageBundleFix-1.1.1.zip` у `Stardew Valley/Mods/`.
 
 **Налаштування:** кожну фічу можна вимкнути в `config.json` (таблиця вище) або в грі через [Generic Mod Config Menu](https://www.nexusmods.com/stardewvalley/mods/5098) — на Android є порт від NRTnarathip.
 
-**Про клунки:** якщо мовний пак вмикає переклад клунків залежно від стану сейва (як укр. пак Pereclaw — це захист від [SMAPI #812](https://github.com/Pathoschild/SMAPI/issues/812)), то у свіжому сейві назви стануть українськими після першої ночі — мод ловить момент, коли пак вмикає переклад, і перебудовує назви сам. Раніше для цього треба було зберегтися, вийти в меню і зайти заново.
+**Про клунки:** якщо мовний пак вмикає переклад клунків залежно від стану сейва (як укр. пак Pereclaw — це захист від [SMAPI #812](https://github.com/Pathoschild/SMAPI/issues/812)), мод ловить момент, коли пак вмикає переклад, і перебудовує назви сам. Раніше для цього треба було зберегтися, вийти в меню і зайти заново. З 2.2.1 мод ще й перепитує `Data/Bundles` на вході до Ремісничої кімнати, тож пакові не потрібно самому ставити `"Update": "OnLocationChange"` на цю латку — інакше назви лишалися б англійськими до наступного ранку.
 
 **Підтримати:** [монобанка](https://send.monobank.ua/jar/9WQuPLcBwx), картка `4874 1000 3082 2038`.

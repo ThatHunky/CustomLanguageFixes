@@ -9,9 +9,9 @@ Nexus не має API для завантаження модів (тільки �
 |---|---|---|
 | Name | Custom Language Fixes (Android) | Custom Language Bundle Fix |
 | Category | User Interface (id 10) | User Interface (id 10) |
-| Version | 2.2.0 | 1.1.0 |
+| Version | 2.2.1 | 1.1.1 |
 | Опис | `android-description.bbcode` | `pc-description.bbcode` |
-| Файл | `releases/CustomLanguageFixes-2.2.0.zip` | `releases/CustomLanguageBundleFix-1.1.0.zip` |
+| Файл | `releases/CustomLanguageFixes-2.2.1.zip` | `releases/CustomLanguageBundleFix-1.1.1.zip` |
 
 «(Android)» у назві сторінки лишаємо навмисно — щоб ПК-гравці не ставили мобільний мод і не писали баг-репорти.
 У самому manifest назва без суфікса, бо там вона показується як заголовок меню налаштувань.
@@ -46,5 +46,6 @@ Nexus дозволяє посилання на зовнішні донати. М
 ## Що зробити ДО публікації
 
 - [x] Протестовано в грі (2.2.0 / 1.1.0): рецепти/креслення, статус фермера за статтю, клунки. Працює на моб. і ПК.
+- [ ] Протестувати в грі 2.2.1 / 1.1.1: у сейві, де пак гейтить переклад клунків, зайти до Ремісничої кімнати — назви мають стати перекладеними без перезаходу і без `"Update": "OnLocationChange"` у паку (моб. + ПК).
 - [x] Скріншоти готові — `assets/recipes/`, `assets/social/`, `assets/bundles/` (4 шт.).
 - [ ] Погодити з Pereclaw згадку пака в описі (не обов'язково, але ввічливо).
