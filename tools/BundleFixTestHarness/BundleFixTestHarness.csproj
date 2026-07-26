@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>BundleFixTestHarness</AssemblyName>
+    <RootNamespace>BundleFixTestHarness</RootNamespace>
+    <Nullable>disable</Nullable>
+    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- ті самі libs, що й у ПК-мода: окремої теки цей харнес не має -->
+    <Reference Include="StardewValley"><HintPath>..\..\src\CustomLanguageBundleFix\libs\Stardew Valley.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="StardewValley.GameData"><HintPath>..\..\src\CustomLanguageBundleFix\libs\StardewValley.GameData.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="MonoGame.Framework"><HintPath>..\..\src\CustomLanguageBundleFix\libs\MonoGame.Framework.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="StardewModdingAPI"><HintPath>..\..\src\CustomLanguageBundleFix\libs\StardewModdingAPI.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="SMAPI.Toolkit.CoreInterfaces"><HintPath>..\..\src\CustomLanguageBundleFix\libs\SMAPI.Toolkit.CoreInterfaces.dll</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+</Project>

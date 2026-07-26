@@ -1,0 +1,9 @@
+{
+  "Name": "Bundle Fix Test Harness",
+  "Author": "ThatHunky",
+  "Version": "1.0.0",
+  "Description": "Dev-only harness: fakes a custom language pack that gates its Data/Bundles translation, so the bundle-name fix can be tested without Content Patcher or a real language pack.",
+  "UniqueID": "ThatHunky.BundleFixTestHarness",
+  "EntryDll": "BundleFixTestHarness.dll",
+  "MinimumApiVersion": "4.0.0"
+}
