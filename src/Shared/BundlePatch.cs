@@ -2,6 +2,7 @@ using System;
 using HarmonyLib;
 using StardewModdingAPI;
 using StardewValley;
+using StardewValley.Locations;
 
 namespace CustomLanguage.Shared
 {
@@ -35,6 +36,33 @@ namespace CustomLanguage.Shared
                         RebuildNames();
                         break;
                     }
+                }
+            };
+            // вхід до Ремісничої кімнати — просимо CP переоцінити свої умови на Data/Bundles.
+            // Без цього кожен пак мусив би сам ставити «"Update": "OnLocationChange"» на цей асет,
+            // інакше гейт (HasFlag/HasSeenEvent тощо) спрацює хіба на дефолтному OnDayStart.
+            // Сама інвалідація безпечна: SMAPI-пропагатор Data/Bundles не обробляє, а назви
+            // перебудує наш AssetsInvalidated-хук вище. Гра ж не перечитує їх ніколи —
+            // _bundleDataDirty ставлять лише SetBundleData (нова гра / завантаження) і net-івенти.
+            helper.Events.Player.Warped += (_, e) =>
+            {
+                if (!_enabled() || !e.IsLocalPlayer || _rebuilding)
+                    return;
+                if (LocalizedContentManager.CurrentLanguageCode != LocalizedContentManager.LanguageCode.mod)
+                    return;
+                // локацію беремо з Game1, а не з e.NewLocation: у мобільного SMAPI-API GameLocation
+                // приходить із ДЕСКТОПНОГО «Stardew Valley», якого Android-проєкт не референсить —
+                // згадка того типу тут ламала б збірку (CS0012). Для локального гравця
+                // Game1.currentLocation на момент Warped уже нова.
+                if (!(Game1.currentLocation is CommunityCenter))
+                    return;
+                try
+                {
+                    helper.GameContent.InvalidateCache("Data/Bundles");
+                }
+                catch (Exception ex)
+                {
+                    _log.Log(_helper.Translation.Get("log.bundles-failed", new { error = ex.Message }), LogLevel.Warn);
                 }
             };
         }
