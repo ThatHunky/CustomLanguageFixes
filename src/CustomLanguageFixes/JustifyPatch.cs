@@ -44,7 +44,10 @@ namespace CustomLanguageFixes
             _rendering = true;
             try
             {
-                DrawJustified(b, s, x, y, characterPosition, width, alpha, layerDepth, junimoText, color);
+                // розкладку рахуємо ДО малювання: якщо щось кине — ще нічого не намальовано,
+                // і ванільний рендер не накладеться на наш наполовину намальований текст
+                var layout = GetLayout(s, width);
+                DrawLayout(b, layout, x, y, characterPosition, alpha, layerDepth, junimoText, color);
                 return false; // ванільний drawString не викликаємо
             }
             catch
@@ -57,10 +60,39 @@ namespace CustomLanguageFixes
             }
         }
 
-        private static void DrawJustified(SpriteBatch b, string s, int x, int y,
-            int charLimit, int width, float alpha, float layerDepth, bool junimoText, Color? color)
+        // Готова розкладка: слово, його індекс у рядку (для машинки), зсув X і номер рядка.
+        private sealed class Layout
         {
-            int lineH = SpriteText.getHeightOfString("\u0410\u0431"); // висота одного рядка
+            public readonly List<(string w, int start, float dx, int line)> Words = new();
+            public int LineH;
+        }
+
+        // Кеш розкладки: текст і ширина діалогу між кадрами не міняються, а міряти кожне
+        // слово щокадру — зайві алокації й GC на Android.
+        private static Layout _cached;
+        private static string _cachedS;
+        private static int _cachedWidth;
+        private static float _cachedZoom;
+        private static object _cachedLang;
+
+        private static Layout GetLayout(string s, int width)
+        {
+            float zoom = SpriteText.fontPixelZoom;
+            object lang = LocalizedContentManager.CurrentModLanguage;
+            if (_cached != null && width == _cachedWidth && zoom == _cachedZoom
+                && ReferenceEquals(lang, _cachedLang) && s == _cachedS)
+                return _cached;
+            var layout = BuildLayout(s, width);
+            (_cached, _cachedS, _cachedWidth, _cachedZoom, _cachedLang) = (layout, s, width, zoom, lang);
+            return layout;
+        }
+
+        private static Layout BuildLayout(string s, int width)
+        {
+            var layout = new Layout();
+            // крок між рядками, а не висота одного рядка: у спрайтовому шрифті (UseLatinFont)
+            // висота рядка 16*zoom, а ванільний перенос зсуває на 18*zoom
+            layout.LineH = SpriteText.getHeightOfString("\u0410^\u0431") - SpriteText.getHeightOfString("\u0410");
             int spaceW = SpriteText.getWidthOfString("\u0430 \u0430") - 2 * SpriteText.getWidthOfString("\u0430");
             if (spaceW <= 0)
                 spaceW = (int)(8f * SpriteText.fontPixelZoom / 3f);
@@ -70,14 +102,12 @@ namespace CustomLanguageFixes
             s = s.Replace(Environment.NewLine, "");
             // ванільний перенос спрацьовує, коли кінець слова >= x + width - 4 — тримаємо той самий край
             int maxW = width - 4;
-            int curY = y;
+            int lineIdx = 0;
             var line = new List<(string w, int px, int start)>();
             int lineW = 0;
 
-            // false = машинка ще не дійшла до кінця рядка, далі малювати нічого
-            bool FlushLine(bool lastLine)
+            void FlushLine(bool lastLine)
             {
-                bool more = true;
                 int gaps = line.Count - 1;
                 float add = 0f;
                 if (!lastLine && gaps > 0)
@@ -86,19 +116,15 @@ namespace CustomLanguageFixes
                     add = Math.Min(extra / gaps, spaceW * 1.5f); // не розтягуємо до карикатури
                     if (add < 0f) add = 0f;
                 }
-                float cx = x;
+                float dx = 0f;
                 foreach (var (w, px, start) in line)
                 {
-                    if (start >= charLimit) { more = false; break; }
-                    string part = (charLimit - start >= w.Length) ? w : w.Substring(0, charLimit - start);
-                    SpriteText.drawString(b, part, (int)cx, curY, 999999, -1, 999999, alpha, layerDepth, junimoText, -1, "", color);
-                    if (part.Length < w.Length) { more = false; break; }
-                    cx += px + spaceW + add;
+                    layout.Words.Add((w, start, dx, lineIdx));
+                    dx += px + spaceW + add;
                 }
                 line.Clear();
                 lineW = 0;
-                curY += lineH;
-                return more;
+                lineIdx++;
             }
 
             int pos = 0;
@@ -121,7 +147,7 @@ namespace CustomLanguageFixes
                         int projected = (line.Count == 0) ? px : lineW + spaceW + px;
                         if (line.Count > 0 && projected > maxW)
                         {
-                            if (!FlushLine(lastLine: false)) return;
+                            FlushLine(lastLine: false);
                             projected = px;
                         }
                         lineW = projected;
@@ -131,8 +157,24 @@ namespace CustomLanguageFixes
                 }
 
                 // останній рядок абзацу не розтягуємо; порожній абзац (^^) — просто порожній рядок
-                if (pos >= charLimit || !FlushLine(lastLine: true)) return;
+                FlushLine(lastLine: true);
                 pos = pEnd + 1;
+            }
+            return layout;
+        }
+
+        private static void DrawLayout(SpriteBatch b, Layout layout, int x, int y,
+            int charLimit, float alpha, float layerDepth, bool junimoText, Color? color)
+        {
+            foreach (var (w, start, dx, line) in layout.Words)
+            {
+                if (start >= charLimit)
+                    return; // машинка ще не дійшла до цього слова
+                string part = (charLimit - start >= w.Length) ? w : w.Substring(0, charLimit - start);
+                SpriteText.drawString(b, part, (int)(x + dx), y + line * layout.LineH, 999999, -1, 999999,
+                    alpha, layerDepth, junimoText, -1, "", color);
+                if (part.Length < w.Length)
+                    return;
             }
         }
     }
