@@ -37,7 +37,7 @@ namespace CustomLanguage.Shared
                     return;
 
                 string suffix = Game1.content.LoadString("Strings\\StringsFromCSFiles:Object.cs.12657");
-                if (!string.IsNullOrEmpty(suffix) && __result.EndsWith(suffix))
+                if (!string.IsNullOrEmpty(suffix) && __result.EndsWith(suffix, StringComparison.Ordinal))
                 {
                     string ua = (__instance.Category == -7) ? " (Рецепт)" : " (Креслення)";
                     __result = __result.Substring(0, __result.Length - suffix.Length) + ua;
