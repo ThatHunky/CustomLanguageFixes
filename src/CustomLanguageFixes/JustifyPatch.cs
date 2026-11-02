@@ -65,56 +65,74 @@ namespace CustomLanguageFixes
             if (spaceW <= 0)
                 spaceW = (int)(8f * SpriteText.fontPixelZoom / 3f);
 
-            int drawn = 0; // скільки символів вихідного рядка вже "надруковано" (для машинки)
+            // Як і ванільний drawString: переводи рядка ОС викидаються ДО індексації машинки,
+            // а розрив рядка в тексті гри — '^' (SpriteText.newLine), не '\n'.
+            s = s.Replace(Environment.NewLine, "");
+            // ванільний перенос спрацьовує, коли кінець слова >= x + width - 4 — тримаємо той самий край
+            int maxW = width - 4;
             int curY = y;
+            var line = new List<(string w, int px, int start)>();
+            int lineW = 0;
 
-            foreach (string paragraph in s.Split('\n'))
+            // false = машинка ще не дійшла до кінця рядка, далі малювати нічого
+            bool FlushLine(bool lastLine)
             {
-                var words = paragraph.Split(' ');
-                var line = new List<(string w, int px)>();
-                int lineW = 0;
-
-                void FlushLine(bool lastLine)
+                bool more = true;
+                int gaps = line.Count - 1;
+                float add = 0f;
+                if (!lastLine && gaps > 0)
                 {
-                    if (line.Count == 0) { curY += lineH; return; }
-                    int gaps = line.Count - 1;
-                    float add = 0f;
-                    if (!lastLine && gaps > 0)
-                    {
-                        float extra = width - lineW;
-                        add = Math.Min(extra / gaps, spaceW * 1.5f); // не розтягуємо до карикатури
-                        if (add < 0f) add = 0f;
-                    }
-                    float cx = x;
-                    foreach (var (w, px) in line)
-                    {
-                        if (drawn >= charLimit) return;
-                        string part = (charLimit - drawn >= w.Length) ? w : w.Substring(0, charLimit - drawn);
-                        if (part.Length > 0)
-                            SpriteText.drawString(b, part, (int)cx, curY, 999999, -1, 999999, alpha, layerDepth, junimoText, -1, "", color);
-                        drawn += w.Length + 1; // +1 за пробіл після слова
-                        cx += px + spaceW + add;
-                    }
-                    curY += lineH;
+                    float extra = maxW - lineW;
+                    add = Math.Min(extra / gaps, spaceW * 1.5f); // не розтягуємо до карикатури
+                    if (add < 0f) add = 0f;
                 }
-
-                foreach (string w in words)
+                float cx = x;
+                foreach (var (w, px, start) in line)
                 {
-                    int px = SpriteText.getWidthOfString(w);
-                    int projected = (line.Count == 0) ? px : lineW + spaceW + px;
-                    if (line.Count > 0 && projected > width)
+                    if (start >= charLimit) { more = false; break; }
+                    string part = (charLimit - start >= w.Length) ? w : w.Substring(0, charLimit - start);
+                    SpriteText.drawString(b, part, (int)cx, curY, 999999, -1, 999999, alpha, layerDepth, junimoText, -1, "", color);
+                    if (part.Length < w.Length) { more = false; break; }
+                    cx += px + spaceW + add;
+                }
+                line.Clear();
+                lineW = 0;
+                curY += lineH;
+                return more;
+            }
+
+            int pos = 0;
+            while (pos <= s.Length)
+            {
+                int pEnd = s.IndexOf(SpriteText.newLine, pos);
+                if (pEnd < 0) pEnd = s.Length;
+
+                // слова абзацу з їхнім індексом у вихідному рядку (індекс потрібен машинці);
+                // порожні «слова» від подвійних пробілів пропускаємо — проміжок однаково рахуємо самі
+                int wStart = pos;
+                while (wStart <= pEnd)
+                {
+                    int wEnd = s.IndexOf(' ', wStart, pEnd - wStart);
+                    if (wEnd < 0) wEnd = pEnd;
+                    if (wEnd > wStart)
                     {
-                        FlushLine(lastLine: false);
-                        if (drawn >= charLimit) return;
-                        line.Clear();
-                        lineW = px;
-                    }
-                    else
+                        string w = s.Substring(wStart, wEnd - wStart);
+                        int px = SpriteText.getWidthOfString(w);
+                        int projected = (line.Count == 0) ? px : lineW + spaceW + px;
+                        if (line.Count > 0 && projected > maxW)
+                        {
+                            if (!FlushLine(lastLine: false)) return;
+                            projected = px;
+                        }
                         lineW = projected;
-                    line.Add((w, px));
+                        line.Add((w, px, wStart));
+                    }
+                    wStart = wEnd + 1;
                 }
-                FlushLine(lastLine: true); // останній рядок абзацу не розтягуємо
-                if (drawn >= charLimit) return;
+
+                // останній рядок абзацу не розтягуємо; порожній абзац (^^) — просто порожній рядок
+                if (pos >= charLimit || !FlushLine(lastLine: true)) return;
+                pos = pEnd + 1;
             }
         }
     }
