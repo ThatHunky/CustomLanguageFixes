@@ -124,6 +124,10 @@ namespace CustomLanguageFixes
             var area = ScrollAreaF(__instance);
             if (area != null && area.havePanelScrolled)
                 return; // це був скрол, не тап
+            // прокручені за рамку ряди не малюються (скісор), але RowBounds їх лишає —
+            // без цієї перевірки тап під/над меню міг вибрати невидиму мову
+            if (!MainBoxF(__instance).Contains(x, y))
+                return;
             for (int i = 0; i < _langs.Count; i++)
             {
                 if (!RowBounds(__instance, i).Contains(x, y))
