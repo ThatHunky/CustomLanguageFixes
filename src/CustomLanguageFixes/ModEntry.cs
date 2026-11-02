@@ -64,7 +64,7 @@ namespace CustomLanguageFixes
             string chosen = code == LocalizedContentManager.LanguageCode.mod
                 ? LocalizedContentManager.CurrentModLanguage?.Id ?? ""
                 : code.ToString();
-            if (Config.PreferredLanguage != chosen)
+            if (!_fallingBack && Config.PreferredLanguage != chosen)
             {
                 Config.PreferredLanguage = chosen;
                 H.WriteConfig(Config);
@@ -115,7 +115,7 @@ namespace CustomLanguageFixes
             if (langs.Count == 0)
             {
                 if (LocalizedContentManager.CurrentLanguageCode == LocalizedContentManager.LanguageCode.mod)
-                    SwitchTo(null); // відкат на en, щоб не зависнути на битій мові
+                    SwitchTo(null, remember: false); // відкат на en, щоб не зависнути на битій мові — але вибір юзера не затираємо
                 return;
             }
 
@@ -133,11 +133,17 @@ namespace CustomLanguageFixes
         // Спільна логіка перемикання мови — і для авто-застосування на старті, і для тапу в
         // меню мов (LangMenuPatch). PreferredLanguage виставляємо ДО зміни мови, щоб OnLanguageChanged
         // побачив його вже актуальним і не переписував config удруге; запис робимо тут один раз.
-        internal static void SwitchTo(ModLanguage lang, string logKey = "log.language-switched")
+        // remember: false — аварійний відкат: мова тимчасово зникла (пак вимкнено), і коли пак
+        // повернеться, OnAssetReady має знову ввімкнути його, а не вважати «en» свідомим вибором.
+        private static bool _fallingBack;
+
+        internal static void SwitchTo(ModLanguage lang, string logKey = "log.language-switched", bool remember = true)
         {
             try
             {
-                Config.PreferredLanguage = lang?.Id ?? "en";
+                if (remember)
+                    Config.PreferredLanguage = lang?.Id ?? "en";
+                _fallingBack = !remember;
                 if (lang == null)
                 {
                     LocalizedContentManager.CurrentLanguageCode = LocalizedContentManager.LanguageCode.en; // property => OnLanguageChange => перезавантаження рядків
@@ -157,12 +163,17 @@ namespace CustomLanguageFixes
                 prefs.loadPreferences(false, true);
                 prefs.savePreferences(false, true);
 
-                H.WriteConfig(Config);
+                if (remember)
+                    H.WriteConfig(Config);
                 Log.Log(H.Translation.Get(logKey, new { id = lang?.Id ?? "en" }), LogLevel.Info);
             }
             catch (Exception ex)
             {
                 Log.Log(H.Translation.Get("log.language-switch-failed", new { error = ex.Message }), LogLevel.Error);
+            }
+            finally
+            {
+                _fallingBack = false;
             }
         }
 
