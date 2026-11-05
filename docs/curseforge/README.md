@@ -20,4 +20,4 @@
 
 ## Оновлення
 
-Files → Add File, zip із `releases/`, назва як `CustomLanguageFixes 2.2.1`, версія гри, changelog. Залежності не вказуємо: Android-мод потребує форку SMAPI, якого на CurseForge немає, а застосунок CurseForge не ставить моди на Android.
+Files → Add File, zip із `releases/`, назва як `CustomLanguageFixes 2.2.1`, версія гри, changelog. Залежності поки не вказані: вимоги описані в тексті сторінки, а Android-мод працює з форком SMAPI від NRTnarathip, а не зі звичайним SMAPI.
