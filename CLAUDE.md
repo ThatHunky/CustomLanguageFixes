@@ -66,3 +66,4 @@ Commit **each logical change as its own commit** — don't lump unrelated edits 
 - `docs/superpowers/specs/` and `docs/superpowers/plans/` — design docs and implementation plans.
 - `docs/Chat-history.md` — the full decompilation / bug-hunt diagnosis history behind these fixes.
 - `docs/nexus/` — Nexus Mods release descriptions (BBCode) and the release checklist.
+- `docs/curseforge/` — CurseForge project IDs, settings and descriptions (Markdown).
