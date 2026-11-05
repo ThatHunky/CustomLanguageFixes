@@ -30,9 +30,9 @@ Three of the fixes above are shared game bugs — **bundle names**, the **social
 
 ## Installation
 
-**Android:** install the [SMAPI Launcher](https://github.com/NRTnarathip/SMAPI-Android-1.6) and game 1.6.15.1+, unzip `CustomLanguageFixes-2.2.0.zip` from [releases/](releases/) into `StardewValley/Mods/` (next to your language pack), and restart through the launcher. Pick your language from the globe button on the title screen — custom languages are at the bottom of the list.
+**Android:** install the [SMAPI Launcher](https://github.com/NRTnarathip/SMAPI-Android-1.6) and game 1.6.15.1+, unzip `CustomLanguageFixes-2.2.1.zip` from [releases/](releases/) into `StardewValley/Mods/` (next to your language pack), and restart through the launcher. Pick your language from the globe button on the title screen — custom languages are at the bottom of the list.
 
-**PC:** install [SMAPI](https://smapi.io), unzip `CustomLanguageBundleFix-1.1.0.zip` into `Stardew Valley/Mods/`, run the game through SMAPI.
+**PC:** install [SMAPI](https://smapi.io), unzip `CustomLanguageBundleFix-1.1.1.zip` into `Stardew Valley/Mods/`, run the game through SMAPI.
 
 **Optional (Android):** install [Generic Mod Config Menu](https://www.nexusmods.com/stardewvalley/mods/5098) (Android port: NRTnarathip's [StardewValleyMods-Android](https://github.com/NRTnarathip/StardewValleyMods-Android)) to change settings in-game instead of editing `config.json`. The PC mod has no menu — its only setting is an escape hatch nobody needs to touch.
 
@@ -103,6 +103,7 @@ tools/stardew-font-editor.html  — in-browser editor for the game's .fnt fonts;
 
 ## Version history
 
+- **2.2.1** (Android) / **1.1.1** (PC) — justified dialogue now treats `^` as a line break like vanilla, which stops text from getting scrambled in strings that use it, and matches the vanilla line spacing and wrap edge. The layout is cached instead of recalculated every frame, and a failure can no longer draw vanilla text over half-drawn text. The language menu ignores taps on rows scrolled out of its frame. If a language pack goes missing, the emergency fallback to English no longer overwrites your saved language. The recipe suffix comparison is ordinal rather than culture-based (the only change in the PC mod)
 - **2.2.0** (Android) / **1.1.0** (PC) — social-page single-status fix: single male farmers no longer show the feminine status (a first-party bug, [forum report](https://forums.stardewvalley.net/threads/53790/)). Both the social fix and the «(Recipe)» suffix move to shared code, so the PC mod now does three things (bundles, social, recipe), not one
 - **2.1.0** — the 12-hour clock option now actually works: custom languages used to get 12-hour numbers with no am/pm at all, so the mod now swaps to the English branch and substitutes the pack's own am/pm strings. GMCM menu down to three settings with localized dropdown values; «(Recipe)» suffix is config-only now, since it's part of the translation rather than a preference. Mod renamed from «Custom Language Fixes (Android)» to «Custom Language Fixes»
 - **2.0.1** — GMCM menu trimmed to the four settings worth changing (`Clock` renamed to «Time format»); the language-menu and bundle-fix switches stay in `config.json` only. PC mod (1.0.1) drops its GMCM menu entirely
@@ -144,11 +145,11 @@ Card: `4874 1000 3082 2038`
 - **Custom Language Fixes (Android)** — вісім фіксів: 24-годинний годинник на HUD, мод-мови у вбудованому меню вибору мов, пам'ять вибору мови, зум шрифта пака, рівний правий край у діалогах (суто мобільні), а також спільні з ПК — назви клунків Джунімо, статус «самотній» за статтю на слоті фермера і суфікс «(Рецепт)/(Креслення)».
 - **Custom Language Bundle Fix (ПК)** — три спільні фікси: назви клунків, статус «самотній» на слоті фермера і суфікс рецептів. Решта з Android-списку — суто мобільна.
 
-**Статус:** у розробці, на Nexus ще не опубліковано.
+**Статус:** обидва моди опубліковано на Nexus Mods — [Android](https://www.nexusmods.com/stardewvalley/mods/49539) і [ПК](https://www.nexusmods.com/stardewvalley/mods/49543).
 
-**Встановлення (Android):** постав [SMAPI Launcher](https://github.com/NRTnarathip/SMAPI-Android-1.6), розпакуй `CustomLanguageFixes-2.2.0.zip` з [releases/](releases/) у `StardewValley/Mods/` поряд з мовним паком, перезапусти гру через лаунчер. Мова вибирається кнопкою-бульбашкою на титулці — кастомні мови внизу списку.
+**Встановлення (Android):** постав [SMAPI Launcher](https://github.com/NRTnarathip/SMAPI-Android-1.6), розпакуй `CustomLanguageFixes-2.2.1.zip` з [releases/](releases/) у `StardewValley/Mods/` поряд з мовним паком, перезапусти гру через лаунчер. Мова вибирається кнопкою-бульбашкою на титулці — кастомні мови внизу списку.
 
-**Встановлення (ПК):** постав [SMAPI](https://smapi.io), розпакуй `CustomLanguageBundleFix-1.1.0.zip` у `Stardew Valley/Mods/`.
+**Встановлення (ПК):** постав [SMAPI](https://smapi.io), розпакуй `CustomLanguageBundleFix-1.1.1.zip` у `Stardew Valley/Mods/`.
 
 **Налаштування:** кожну фічу можна вимкнути в `config.json` (таблиця вище) або в грі через [Generic Mod Config Menu](https://www.nexusmods.com/stardewvalley/mods/5098) — на Android є порт від NRTnarathip.
 
