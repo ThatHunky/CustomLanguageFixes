@@ -1,8 +1,8 @@
 {
   "Name": "Custom Language Bundle Fix",
   "Author": "ThatHunky & DID",
-  "Version": "1.1.1",
-  "Description": "Fixes for custom (mod) languages on PC: Junimo bundle names show immediately, single male farmers get the correct relationship status on the social page, and Ukrainian recipe/blueprint suffixes are localized.",
+  "Version": "1.2.0",
+  "Description": "Fixes for custom (mod) languages on PC: Junimo bundle names show immediately, single male farmers get the correct relationship status on the social page, Ukrainian recipe/blueprint suffixes are localized, and Ukrainian names substituted mid-sentence are lowercased.",
   "UniqueID": "ThatHunky.CustomLanguageBundleFix",
   "EntryDll": "CustomLanguageBundleFix.dll",
   "MinimumApiVersion": "4.0.0",
