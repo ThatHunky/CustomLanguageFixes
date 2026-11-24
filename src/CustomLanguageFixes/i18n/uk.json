@@ -5,6 +5,8 @@
   "log.bundles-refreshed": "Назви клунків перелокалізовано.",
   "log.bundles-rebuilt": "Назви клунків перебудовано після оновлення асета.",
   "log.bundles-failed": "Не вдалося оновити назви клунків: {{error}}",
+  "log.grammar-method-missing": "Граматичний фікс: метод {{method}} не знайдено, пропущено.",
+  "log.grammar-patch-failed": "Граматичний фікс: не вдалося пропатчити {{method}}: {{error}}",
 
   "config.clock.name": "Формат часу",
   "config.clock.desc": "24 години — час на годиннику як 21:00. 12 годин — як 9:00 з позначкою дп/пп.",

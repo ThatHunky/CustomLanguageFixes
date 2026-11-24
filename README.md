@@ -6,8 +6,8 @@ Two SMAPI mods that fix what Stardew Valley breaks for **custom (mod) languages*
 
 | Mod | Platform | What it's for |
 |---|---|---|
-| **Custom Language Fixes (Android)** | Android (SMAPI [fork by NRTnarathip](https://github.com/NRTnarathip/SMAPI-Android-1.6)) | The mobile port forks a lot of UI code and forgets the `mod` language branch — eight fixes (five mobile-only, three shared with PC) |
-| **Custom Language Bundle Fix** | PC (Windows/Linux/macOS) | The three cross-platform fixes: Junimo bundle names, the social-page single status, and the «(Recipe)» suffix |
+| **Custom Language Fixes (Android)** | Android (SMAPI [fork by NRTnarathip](https://github.com/NRTnarathip/SMAPI-Android-1.6)) | The mobile port forks a lot of UI code and forgets the `mod` language branch — nine fixes (five mobile-only, four shared with PC) |
+| **Custom Language Bundle Fix** | PC (Windows/Linux/macOS) | The four cross-platform fixes: Junimo bundle names, the social-page single status, the «(Recipe)» suffix, and Ukrainian grammar in substituted names |
 
 Tested on Stardew Valley **1.6.15.3** (Android build 245, SMAPI 4.3.2) and **1.6.15** (PC).
 
@@ -19,6 +19,7 @@ Tested on Stardew Valley **1.6.15.3** (Android build 245, SMAPI 4.3.2) and **1.6
 | **Custom languages in the language menu** | The built-in mobile `LanguageSelectionMenu` only lists 12 hardcoded languages | Postfixes on `SetupButtons`/`draw`/`releaseLeftClick` append a row per installed pack (using each pack's own `ButtonTexture`), extend the scroll area, and handle taps. Multiple packs each get their own row |
 | **Language memory** | Auto-switching forced the pack language back even when the player deliberately picked another one | The choice (including vanilla languages) is written to `config.json` and to the game's preferences, and respected on startup |
 | **Localized «(Recipe)» suffix** | The `(Recipe)` suffix on item names was left untranslated | Postfix on `Object.DisplayName`: food (category −7) gets «(рецепт)», everything else «(креслення)». Only runs for packs with language code `uk` — other languages are unaffected. Ported from DID's desktop mod RecipeUkrainizacija |
+| **Ukrainian grammar in substituted names** | The game drops building, animal and tool names into the middle of a sentence as-is, capitalized — Robin's upgrade prompt, Clint's «tool is ready», Marnie's «choose a building for your animal». Ukrainian writes those in lowercase. Several of Marnie's animal names also carry stray capitals, and one JojaMart «not enough money» line lacks its final period | Prefixes on `LoadString(path, sub1)` and `LoadString(path, sub1, sub2)` lowercase the first letter of the substituted name for those keys only; a postfix on `LoadString(path)` sentence-cases Marnie's animal names; a prefix on `Game1.drawObjectDialogue` adds the missing period at JojaMart. Only runs for packs with language code `uk`. Ported from DID's desktop mod Ukrainian Grammar Fix |
 | **Font zoom** | Mobile `SpriteText.SetFontPixelZoom()` has no `mod` branch and overwrites the pack's zoom (3.3 → 3) | Postfix restores the pack's `FontPixelZoom` after every recalculation |
 | **Justified dialogue** | Greedy word wrap leaves a ragged right edge, which is very visible with long words | Custom renderer on top of the vanilla one: spaces stretch to even out the edge (max 1.5× space width), the last line of a paragraph is left alone, typewriter effect and response options behave as usual, and any exception falls back to vanilla silently |
 | **Social page: single farmers** | Single **male** farmers (your own character, co-op farmhands) show the **feminine** single status in gendered languages: `SocialPage.drawFarmerSlot` only reads `..._Single_Female` and splits it on `/`, so a pack with separate `_Male`/`_Female` strings gets the female form for men. A first-party bug ([forum report](https://forums.stardewvalley.net/threads/53790/)), identical on mobile and desktop | While the farmer slot draws, substitute `LoadString(…Single_Female)` with the pack's gender-correct string (`_Male` for men). It has no `/`, so the game's split is a no-op — works for any custom language, on both platforms |
@@ -26,7 +27,7 @@ Tested on Stardew Valley **1.6.15.3** (Android build 245, SMAPI 4.3.2) and **1.6
 
 ## Custom Language Bundle Fix (PC)
 
-Three of the fixes above are shared game bugs — **bundle names**, the **social-page single status**, and the **«(Recipe)» suffix** — so the PC mod compiles them from `src/Shared/` (`BundlePatch`, `SocialPatch`, `RecipePatch`). The rest of the Android list is mobile-only: the desktop game handles custom languages correctly in its menus, clock, and font handling.
+Four of the fixes above are shared game bugs — **bundle names**, the **social-page single status**, the **«(Recipe)» suffix**, and **Ukrainian grammar in substituted names** — so the PC mod compiles them from `src/Shared/` (`BundlePatch`, `SocialPatch`, `RecipePatch`, `GrammarPatch`). The rest of the Android list is mobile-only: the desktop game handles custom languages correctly in its menus, clock, and font handling.
 
 ## Installation
 
@@ -52,10 +53,11 @@ Every feature can be switched off. Edit `config.json` in the mod folder, or use 
 | `LanguageMenu` | `true` | no | Show custom languages in the built-in language menu |
 | `BundleNamesFix` | `true` | no | Junimo bundle name fix |
 | `SocialSingleFix` | `true` | no | Correct single-status gender on the social page |
+| `GrammarFix` | `true` | no | Lowercase substituted names and the other Ukrainian grammar fixes (only active for `uk` packs) |
 
-The last five are config-only escape hatches for troubleshooting a mod conflict — there's no reason to turn them off in normal play. Two of them wouldn't fully take effect mid-session anyway: the language menu re-reads its setting the next time it opens, and already-localized bundle names only revert after a save reload.
+The last six are config-only escape hatches for troubleshooting a mod conflict — there's no reason to turn them off in normal play. Two of them wouldn't fully take effect mid-session anyway: the language menu re-reads its setting the next time it opens, and already-localized bundle names only revert after a save reload.
 
-**Custom Language Bundle Fix (PC):** `config.json` only, no in-game menu — `BundleNamesFix`, `SocialSingleFix`, and `RecipeSuffix`, all `true` by default (same meanings as the Android table above).
+**Custom Language Bundle Fix (PC):** `config.json` only, no in-game menu — `BundleNamesFix`, `SocialSingleFix`, `RecipeSuffix`, and `GrammarFix`, all `true` by default (same meanings as the Android table above).
 
 ## Building
 
@@ -85,9 +87,9 @@ Package releases with `python -X utf8 tools/pack_releases.py` — **never** with
 ## Repository structure
 
 ```
-src/Shared/                    — code shared by both mods (Bundle, Social, Recipe patches + GMCM API interface)
+src/Shared/                    — code shared by both mods (Bundle, Social, Recipe, Grammar patches + GMCM API interface)
 src/CustomLanguageFixes/       — Android mod (ModEntry + Clock, LangMenu, Font, Justify + the shared patches)
-src/CustomLanguageBundleFix/   — PC mod (shared Bundle/Social/Recipe patches)
+src/CustomLanguageBundleFix/   — PC mod (shared Bundle/Social/Recipe/Grammar patches)
 legacy/Mobile24hClockFix/      — the original standalone clock fix, superseded by ClockPatch,
                                  kept as history and as a minimal example
 releases/                      — built zips
@@ -132,7 +134,7 @@ Card: `4874 1000 3082 2038`
 ## Credits
 
 - **Pereclaw** — the `Pereclaw.ukrainizacija` Ukrainian translation, with a perfectly written `content.json` (the bug was in the game, not the pack)
-- **DID** — the original desktop RecipeUkrainizacija, and all the mobile testing
+- **DID** — the original desktop RecipeUkrainizacija and Ukrainian Grammar Fix, and all the mobile testing
 - **NRTnarathip** — SMAPI for Android, ImproveGame, and the GMCM port; the clock fix arguably belongs there (see `docs/ImproveGame-PR-description.md`)
 - **spacechase0** — Generic Mod Config Menu
 
@@ -142,8 +144,8 @@ Card: `4874 1000 3082 2038`
 
 **Два SMAPI-моди, які лагодять те, що гра ламає для кастомних (мод-) мов** — для будь-якого мовного пака, не лише українського. Раніше проєкт називався «Солов'їна Долина»; українська назва лишається.
 
-- **Custom Language Fixes (Android)** — вісім фіксів: 24-годинний годинник на HUD, мод-мови у вбудованому меню вибору мов, пам'ять вибору мови, зум шрифта пака, рівний правий край у діалогах (суто мобільні), а також спільні з ПК — назви клунків Джунімо, статус «самотній» за статтю на слоті фермера і суфікс «(рецепт)/(креслення)».
-- **Custom Language Bundle Fix (ПК)** — три спільні фікси: назви клунків, статус «самотній» на слоті фермера і суфікс рецептів. Решта з Android-списку — суто мобільна.
+- **Custom Language Fixes (Android)** — дев'ять фіксів: 24-годинний годинник на HUD, мод-мови у вбудованому меню вибору мов, пам'ять вибору мови, зум шрифта пака, рівний правий край у діалогах (суто мобільні), а також спільні з ПК — назви клунків Джунімо, статус «самотній» за статтю на слоті фермера, суфікс «(рецепт)/(креслення)» і граматика української: назви будівель, тварин та інструментів посеред речення з малої літери.
+- **Custom Language Bundle Fix (ПК)** — чотири спільні фікси: назви клунків, статус «самотній» на слоті фермера, суфікс рецептів і граматика. Решта з Android-списку — суто мобільна.
 
 **Статус:** обидва моди опубліковано на Nexus Mods — [Android](https://www.nexusmods.com/stardewvalley/mods/49539) і [ПК](https://www.nexusmods.com/stardewvalley/mods/49543).
 

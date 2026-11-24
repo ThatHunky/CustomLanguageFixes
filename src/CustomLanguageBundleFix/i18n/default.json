@@ -1,5 +1,7 @@
 {
   "log.bundles-refreshed": "Bundle names relocalized.",
   "log.bundles-rebuilt": "Bundle names rebuilt after asset update.",
-  "log.bundles-failed": "Failed to update bundle names: {{error}}"
+  "log.bundles-failed": "Failed to update bundle names: {{error}}",
+  "log.grammar-method-missing": "Grammar fix: method {{method}} not found, skipped.",
+  "log.grammar-patch-failed": "Grammar fix: failed to patch {{method}}: {{error}}"
 }

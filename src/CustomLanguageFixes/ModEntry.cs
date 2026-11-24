@@ -30,6 +30,7 @@ namespace CustomLanguageFixes
         public bool LanguageMenu { get; set; } = true;
         public bool BundleNamesFix { get; set; } = true;
         public bool SocialSingleFix { get; set; } = true; // «холостий»/«незаміжня» на слоті фермера за статтю
+        public bool GrammarFix { get; set; } = true;      // мала літера в назвах будівель/тварин/інструментів, лише для uk
     }
 
     public class ModEntry : Mod
@@ -52,6 +53,7 @@ namespace CustomLanguageFixes
             JustifyPatch.Apply(harmony);  // рівний правий край тексту діалогів (justify)
             SocialPatch.Apply(harmony, () => Config.SocialSingleFix);   // стать у статусі «самотній» на слоті фермера (Social page)
             BundlePatch.Apply(helper, this.Monitor, () => Config.BundleNamesFix); // локалізовані назви клунків одразу
+            GrammarPatch.Apply(harmony, this.Monitor, helper.Translation, () => Config.GrammarFix); // граматика укр. рядків з підстановками
 
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;     // меню налаштувань (GMCM), якщо є
             helper.Events.Content.AssetReady += OnAssetReady;          // застосувати мову при старті
@@ -93,10 +95,10 @@ namespace CustomLanguageFixes
                 () => H.Translation.Get("config.font-zoom.name"), () => H.Translation.Get("config.font-zoom.desc"));
             gmcm.AddBoolOption(this.ModManifest, () => Config.JustifyDialogue, v => Config.JustifyDialogue = v,
                 () => H.Translation.Get("config.justify.name"), () => H.Translation.Get("config.justify.desc"));
-            // LanguageMenu, BundleNamesFix і RecipeSuffix у меню не виводимо: перші дві вимикати
+            // LanguageMenu, BundleNamesFix, RecipeSuffix і GrammarFix у меню не виводимо: перші дві вимикати
             // нема сенсу (і зміна на льоту не дає повного ефекту — див. коментарі в ModConfig),
-            // а суфікс «(рецепт)» — частина українського перекладу, він має просто працювати.
-            // Усі три лишаються в config.json як аварійний вимикач при конфлікті з іншим модом.
+            // а суфікс «(рецепт)» і граматика — частина українського перекладу, вони мають просто працювати.
+            // Усі лишаються в config.json як аварійний вимикач при конфлікті з іншим модом.
         }
 
         // ---------- мовна логіка ----------

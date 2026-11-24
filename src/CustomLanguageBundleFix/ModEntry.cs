@@ -11,6 +11,7 @@ namespace CustomLanguageBundleFix
         public bool BundleNamesFix { get; set; } = true;
         public bool SocialSingleFix { get; set; } = true; // «холостий»/«незаміжня» на слоті фермера за статтю
         public bool RecipeSuffix { get; set; } = true;    // «(рецепт)»/«(креслення)», лише для uk
+        public bool GrammarFix { get; set; } = true;      // мала літера в назвах будівель/тварин/інструментів, лише для uk
     }
 
     public class ModEntry : Mod
@@ -24,6 +25,7 @@ namespace CustomLanguageBundleFix
             var harmony = new Harmony(this.ModManifest.UniqueID);
             SocialPatch.Apply(harmony, () => _config.SocialSingleFix); // стать у статусі «самотній» на слоті фермера
             RecipePatch.Apply(harmony, () => _config.RecipeSuffix);    // «(рецепт)»/«(креслення)» для укр. мод-мови
+            GrammarPatch.Apply(harmony, this.Monitor, helper.Translation, () => _config.GrammarFix); // граматика укр. рядків з підстановками
             // зміна мови посеред сесії (на ПК меню мов саме фаєрить OnLanguageChange)
             LocalizedContentManager.OnLanguageChange += _ =>
             {
