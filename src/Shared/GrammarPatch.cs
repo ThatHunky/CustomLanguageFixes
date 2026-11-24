@@ -8,13 +8,13 @@ namespace CustomLanguage.Shared
 {
     // Логіка DID.Grammar_fix (Ukrainian Grammar Fix 1.2.0): гра підставляє назви будівель,
     // тварин та інструментів у середину речення з великої літери, а в укр. перекладі вони
-    // мають іти з малої; кілька рядків магазину Марні мають зайві великі літери, а одному
+    // мають іти з малої; кілька рядків-підказок у Марні мають зайві великі літери, а одному
     // бракує крапки в кінці. Спільний для Android і ПК (усі перевантаження LoadString і
     // Game1.drawObjectDialogue(string) звірено в обох збірках). Гейт саме на uk — інші
     // мод-мови не чіпаємо.
     internal static class GrammarPatch
     {
-        // Рядки, у яких усі літери після першої мають бути малими (назви тварин у Марні)
+        // Рядки-підказки у Марні, у яких усі літери після першої мають бути малими
         private static readonly HashSet<string> SentenceCaseKeys = new()
         {
             "Strings\\StringsFromCSFiles:Utility.cs.5926",
@@ -47,7 +47,7 @@ namespace CustomLanguage.Shared
             // 2. Вибір будівлі під тварину у Марні (2 аргументи)
             TryPatch(harmony, typeof(LocalizedContentManager), nameof(LocalizedContentManager.LoadString),
                 new[] { typeof(string), typeof(object), typeof(object) }, prefix: nameof(LoadString2Prefix));
-            // 3. Назви тварин у Марні — рядки без підстановок
+            // 3. Підказки у Марні — рядки без підстановок
             TryPatch(harmony, typeof(LocalizedContentManager), nameof(LocalizedContentManager.LoadString),
                 new[] { typeof(string) }, postfix: nameof(LoadStringPostfix));
             // 4. Крапка в кінці PurchaseAnimalsMenu.cs.11325 у діалозі ДжоджаМарту
@@ -140,7 +140,7 @@ namespace CustomLanguage.Shared
             {
                 if (string.IsNullOrEmpty(dialogue) || !IsActive() || Game1.currentLocation?.Name != "JojaMart")
                     return;
-                if (dialogue == Game1.content.LoadString(NotEnoughMoneyKey) && !dialogue.EndsWith("."))
+                if (dialogue == Game1.content.LoadString(NotEnoughMoneyKey) && !dialogue.EndsWith(".", StringComparison.Ordinal))
                     dialogue += ".";
             }
             catch { }
