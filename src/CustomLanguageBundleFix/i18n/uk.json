@@ -3,5 +3,6 @@
   "log.bundles-rebuilt": "Назви клунків перебудовано після оновлення асета.",
   "log.bundles-failed": "Не вдалося оновити назви клунків: {{error}}",
   "log.grammar-method-missing": "Граматичний фікс: метод {{method}} не знайдено, пропущено.",
-  "log.grammar-patch-failed": "Граматичний фікс: не вдалося пропатчити {{method}}: {{error}}"
+  "log.grammar-patch-failed": "Граматичний фікс: не вдалося пропатчити {{method}}: {{error}}",
+  "log.grammar-error": "Граматичний фікс: помилка в {{method}}, показуємо ванільний рядок: {{error}}"
 }

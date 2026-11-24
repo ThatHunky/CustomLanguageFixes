@@ -94,7 +94,47 @@ namespace CustomLanguage.Shared
         private static string ToLowerFirst(string value) =>
             value.Length == 0 ? value : char.ToLowerInvariant(value[0]) + value.Substring(1);
 
-        private static void LoadString1Prefix(string path, ref object sub1)
+        // Падаємо тихо (гра покаже ванільний рядок), але один раз лишаємо слід у лозі
+        private static void LogError(string where, Exception ex) =>
+            _log?.LogOnce(_i18n.Get("log.grammar-error", new { method = where, error = ex.Message }), LogLevel.Warn);
+
+        // Чи стоїть {index} на початку речення у форматі пака: тоді назву лишаємо з великої.
+        // Формат беремо з того самого менеджера; LoadString(string) не зачіпає ці ключі.
+        private static bool StartsSentence(LocalizedContentManager content, string path, int index)
+        {
+            string format = content.LoadString(path) ?? string.Empty;
+            int pos = format.IndexOf("{" + index + "}", StringComparison.Ordinal);
+            if (pos < 0)
+                return true; // підстановки в рядку нема — нема що виправляти
+            string before = format.Substring(0, pos).TrimEnd().TrimEnd('«', '"', '„', '“', '(').TrimEnd();
+            return before.Length == 0 || ".!?…^".IndexOf(before[before.Length - 1]) >= 0;
+        }
+
+        private static object LowerIfMidSentence(LocalizedContentManager content, string path, int index, object sub) =>
+            sub is string name && name.Length > 0 && !StartsSentence(content, path, index) ? ToLowerFirst(name) : sub;
+
+        // Перша літера велика, решта мала — крім [токенів] і {підстановок}: ключі в них
+        // регістрозалежні, і «[localizedtext ...]» гра вже не розв'яже
+        private static string SentenceCase(string value)
+        {
+            var sb = new System.Text.StringBuilder(value.Length);
+            int square = 0, curly = 0;
+            for (int i = 0; i < value.Length; i++)
+            {
+                char c = value[i];
+                if (c == '[') square++;
+                else if (c == ']' && square > 0) square--;
+                else if (c == '{') curly++;
+                else if (c == '}' && curly > 0) curly--;
+                if (square > 0 || curly > 0 || c == ']' || c == '}')
+                    sb.Append(c);
+                else
+                    sb.Append(i == 0 ? char.ToUpperInvariant(c) : char.ToLowerInvariant(c));
+            }
+            return sb.ToString();
+        }
+
+        private static void LoadString1Prefix(LocalizedContentManager __instance, string path, ref object sub1)
         {
             try
             {
@@ -103,24 +143,21 @@ namespace CustomLanguage.Shared
                 string key = Normalize(path);
                 if (key != UpgradeKey && key != ToolReadyKey)
                     return;
-                if (sub1 is string name && name.Length > 0)
-                    sub1 = ToLowerFirst(name);
+                sub1 = LowerIfMidSentence(__instance, path, 0, sub1);
             }
-            catch { } // падаємо тихо — гра покаже ванільний рядок
+            catch (Exception ex) { LogError(nameof(LoadString1Prefix), ex); }
         }
 
-        private static void LoadString2Prefix(string path, ref object sub1, ref object sub2)
+        private static void LoadString2Prefix(LocalizedContentManager __instance, string path, ref object sub1, ref object sub2)
         {
             try
             {
                 if (!IsActive() || Normalize(path) != AnimalBuildingKey)
                     return;
-                if (sub1 is string building && building.Length > 0)
-                    sub1 = ToLowerFirst(building);
-                if (sub2 is string animal && animal.Length > 0)
-                    sub2 = ToLowerFirst(animal);
+                sub1 = LowerIfMidSentence(__instance, path, 0, sub1);
+                sub2 = LowerIfMidSentence(__instance, path, 1, sub2);
             }
-            catch { }
+            catch (Exception ex) { LogError(nameof(LoadString2Prefix), ex); }
         }
 
         private static void LoadStringPostfix(string path, ref string __result)
@@ -129,21 +166,23 @@ namespace CustomLanguage.Shared
             {
                 if (string.IsNullOrEmpty(__result) || !IsActive() || !SentenceCaseKeys.Contains(Normalize(path)))
                     return;
-                __result = char.ToUpperInvariant(__result[0]) + __result.Substring(1).ToLowerInvariant();
+                __result = SentenceCase(__result);
             }
-            catch { }
+            catch (Exception ex) { LogError(nameof(LoadStringPostfix), ex); }
         }
 
+        // Той самий рядок показують ДжоджаМарт (кінотеатр), автомат-кран у кінотеатрі і (на ПК)
+        // меню Марні — порівняння з рядком і так обмежує патч одним повідомленням, тож без гейту на локацію
         private static void DrawObjectDialoguePrefix(ref string dialogue)
         {
             try
             {
-                if (string.IsNullOrEmpty(dialogue) || !IsActive() || Game1.currentLocation?.Name != "JojaMart")
+                if (string.IsNullOrEmpty(dialogue) || !IsActive())
                     return;
                 if (dialogue == Game1.content.LoadString(NotEnoughMoneyKey) && !dialogue.EndsWith(".", StringComparison.Ordinal))
                     dialogue += ".";
             }
-            catch { }
+            catch (Exception ex) { LogError(nameof(DrawObjectDialoguePrefix), ex); }
         }
     }
 }
