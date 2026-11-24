@@ -14,6 +14,7 @@ It works with **any** language pack, not a specific one. Every patch is gated on
 - **Social page: single male farmers.** In gendered languages the social page showed single male farmers (your own character, co-op farmhands) with the feminine single status — a first-party game bug where the farmer slot only ever reads the female status key. Each farmer now shows the correct gendered status.
 - **Justified dialogue text.** Optional: spaces are stretched so dialogue has an even right edge, which looks much better in languages with long words.
 - **Localized «(Recipe)» suffix.** For Ukrainian packs only — other languages are unaffected.
+- **Ukrainian grammar in substituted names.** For Ukrainian packs only: building, animal and tool names that the game drops into the middle of a sentence (Robin's upgrades, Clint's finished tools, Marnie's animal buildings) are lowercased, as Ukrainian writes them, plus a few smaller capitalization and punctuation fixes in Marnie's and JojaMart's lines. Other languages are unaffected.
 
 ## Requirements
 
@@ -34,7 +35,7 @@ Three settings are available in the in-game menu (with Generic Mod Config Menu i
 ## Credits
 
 - **Pereclaw** — the Ukrainian translation this was originally built for. The bugs were in the game, not in the pack.
-- **DID** — the original desktop RecipeUkrainizacija, and all the mobile testing.
+- **DID** — the original desktop RecipeUkrainizacija and Ukrainian Grammar Fix, and all the mobile testing.
 - **NRTnarathip** — SMAPI for Android and the Generic Mod Config Menu port.
 - **spacechase0** — Generic Mod Config Menu.
 
@@ -44,6 +45,6 @@ Source code and full technical write-up: [github.com/ThatHunky/CustomLanguageFix
 
 Мод лагодить усе, що мобільна версія гри ламає для кастомних (мод-) мов — для будь-якого мовного пака, не лише українського. Раніше проєкт називався «Солов'їна Долина».
 
-Що виправлено: годинник на HUD (тепер або 24-годинний, або 12-годинний із дп/пп — раніше кастомні мови взагалі не мали позначки), мод-мови у вбудованому меню вибору мов, пам'ять вибору мови, зум шрифта пака, назви клунків Джунімо одразу без «збережись і перезайди», правильний за статтю статус «самотній» на слоті фермера, рівний правий край у діалогах і суфікс «(рецепт)/(креслення)» для українських паків.
+Що виправлено: годинник на HUD (тепер або 24-годинний, або 12-годинний із дп/пп — раніше кастомні мови взагалі не мали позначки), мод-мови у вбудованому меню вибору мов, пам'ять вибору мови, зум шрифта пака, назви клунків Джунімо одразу без «збережись і перезайди», правильний за статтю статус «самотній» на слоті фермера, рівний правий край у діалогах суфікс «(рецепт)/(креслення)» для українських паків і назви будівель, тварин та інструментів посеред речення з малої літери (розширення у Робін, готовий інструмент у Клінта, будівлі у Марні).
 
 Потрібні SMAPI для Android (форк NRTnarathip) і будь-який мовний пак. Налаштування — у config.json або в грі через Generic Mod Config Menu.

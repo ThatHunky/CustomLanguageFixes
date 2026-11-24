@@ -20,4 +20,4 @@
 
 ## Оновлення
 
-Files → Add File, zip із `releases/`, назва як `CustomLanguageFixes 2.2.1`, версія гри, changelog. Залежності поки не вказані: вимоги описані в тексті сторінки, а Android-мод працює з форком SMAPI від NRTnarathip, а не зі звичайним SMAPI.
+Files → Add File, zip із `releases/`, назва як `CustomLanguageFixes 2.3.0`, версія гри, changelog. Залежності поки не вказані: вимоги описані в тексті сторінки, а Android-мод працює з форком SMAPI від NRTnarathip, а не зі звичайним SMAPI.
