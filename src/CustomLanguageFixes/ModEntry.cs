@@ -23,7 +23,7 @@ namespace CustomLanguageFixes
         public bool JustifyDialogue { get; set; } = true;
 
         // Не виводяться в GMCM — лише аварійні вимикачі в config.json.
-        public bool RecipeSuffix { get; set; } = true;   // (Рецепт)/(Креслення), діє лише для uk
+        public bool RecipeSuffix { get; set; } = true;   // (рецепт)/(креслення), діє лише для uk
         // Зміна на льоту не дає повного ефекту: меню мов перечитує це при наступному
         // відкритті, а вже локалізовані назви клунків повернуться англійськими
         // тільки після перезавантаження сейва.
@@ -46,7 +46,7 @@ namespace CustomLanguageFixes
 
             var harmony = new Harmony("ThatHunky.CustomLanguageFixes");
             ClockPatch.Apply(harmony);   // 24h HUD-годинник для мод-мов
-            RecipePatch.Apply(harmony, () => Config.RecipeSuffix);  // (Рецепт)/(Креслення) — тільки для укр. мод-мови
+            RecipePatch.Apply(harmony, () => Config.RecipeSuffix);  // (рецепт)/(креслення) — тільки для укр. мод-мови
             LangMenuPatch.Apply(harmony); // мод-мови у вбудованому меню вибору мов
             FontPatch.Apply(harmony);     // зум шрифта пака не затирається shrinkFont'ом
             JustifyPatch.Apply(harmony);  // рівний правий край тексту діалогів (justify)
@@ -95,7 +95,7 @@ namespace CustomLanguageFixes
                 () => H.Translation.Get("config.justify.name"), () => H.Translation.Get("config.justify.desc"));
             // LanguageMenu, BundleNamesFix і RecipeSuffix у меню не виводимо: перші дві вимикати
             // нема сенсу (і зміна на льоту не дає повного ефекту — див. коментарі в ModConfig),
-            // а суфікс «(Рецепт)» — частина українського перекладу, він має просто працювати.
+            // а суфікс «(рецепт)» — частина українського перекладу, він має просто працювати.
             // Усі три лишаються в config.json як аварійний вимикач при конфлікті з іншим модом.
         }
 

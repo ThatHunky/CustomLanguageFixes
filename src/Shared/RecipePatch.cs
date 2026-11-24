@@ -6,7 +6,8 @@ using SObject = StardewValley.Object;
 namespace CustomLanguage.Shared
 {
     // Логіка DID.RecipeUkrainizacija: для укр. мод-мови суфікс «(Recipe)» на назві предмета
-    // замінюємо на «(Рецепт)» (їжа, Category -7) або «(Креслення)» (решта — креслення крафту).
+    // замінюємо на «(рецепт)» (їжа, Category -7) або «(креслення)» (решта — креслення крафту),
+    // з малої літери, як у дужках і має бути за правописом.
     // База гри має один ключ на обидва випадки, тож розрізнити може лише мод. Спільний для
     // Android і ПК; гейт саме на uk — інші мод-мови (тайську тощо) не чіпаємо.
     internal static class RecipePatch
@@ -39,7 +40,7 @@ namespace CustomLanguage.Shared
                 string suffix = Game1.content.LoadString("Strings\\StringsFromCSFiles:Object.cs.12657");
                 if (!string.IsNullOrEmpty(suffix) && __result.EndsWith(suffix, StringComparison.Ordinal))
                 {
-                    string ua = (__instance.Category == -7) ? " (Рецепт)" : " (Креслення)";
+                    string ua = (__instance.Category == -7) ? " (рецепт)" : " (креслення)";
                     __result = __result.Substring(0, __result.Length - suffix.Length) + ua;
                 }
             }

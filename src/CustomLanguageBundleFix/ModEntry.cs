@@ -10,7 +10,7 @@ namespace CustomLanguageBundleFix
         // Аварійні вимикачі в config.json (GMCM на ПК нема): у нормі чіпати не треба.
         public bool BundleNamesFix { get; set; } = true;
         public bool SocialSingleFix { get; set; } = true; // «холостий»/«незаміжня» на слоті фермера за статтю
-        public bool RecipeSuffix { get; set; } = true;    // «(Рецепт)»/«(Креслення)», лише для uk
+        public bool RecipeSuffix { get; set; } = true;    // «(рецепт)»/«(креслення)», лише для uk
     }
 
     public class ModEntry : Mod
@@ -23,7 +23,7 @@ namespace CustomLanguageBundleFix
             BundlePatch.Apply(helper, this.Monitor, () => _config.BundleNamesFix);
             var harmony = new Harmony(this.ModManifest.UniqueID);
             SocialPatch.Apply(harmony, () => _config.SocialSingleFix); // стать у статусі «самотній» на слоті фермера
-            RecipePatch.Apply(harmony, () => _config.RecipeSuffix);    // «(Рецепт)»/«(Креслення)» для укр. мод-мови
+            RecipePatch.Apply(harmony, () => _config.RecipeSuffix);    // «(рецепт)»/«(креслення)» для укр. мод-мови
             // зміна мови посеред сесії (на ПК меню мов саме фаєрить OnLanguageChange)
             LocalizedContentManager.OnLanguageChange += _ =>
             {
